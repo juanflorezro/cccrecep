@@ -1,0 +1,324 @@
+body {
+  margin: 0;
+     font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", "Figtree", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+     font-size: 22px;
+}
+.app {
+     background: #a8d5e5;
+}
+h1 {
+     color: #165a72;
+     margin: 50px auto;
+     font-size: 40px;
+    text-align: center;
+  
+}
+.menu1 {
+     margin-bottom: 40px;
+     margin-top: 20px;
+}
+h2 {
+     color: #165a72;
+}
+
+td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+}
+button{
+  cursor: pointer;
+}
+
+ /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<login>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+ 
+.login-container {
+  max-width: 400px;
+  max-height: 600px;
+  margin: 0 auto;
+  
+}
+.login-form {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.login-title {
+  text-align: center;
+  
+}
+.login-input {
+  width: 95%;
+  margin-bottom: 30px;
+  padding: 10px;
+  font-size: 14px;
+  border:none;
+  border-bottom: 1px solid;
+  text-align: center;
+}
+.login-select {
+  width: 100%;
+  margin-bottom: 30px;
+  padding: 10px;
+  font-size: 14px;
+  border:none;
+  border-bottom: 1px solid;
+  text-align: center;
+}
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.login-button:hover {
+  background-color: #45a049;
+}
+
+/*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<sidebar>>>>>>>>>>>>>>>>>>>*/
+
+.sidebar-bottom {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+/*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<agregarObjeto>>><>>>>>>>>>>>>>>*/
+.btn-agregar{
+  display: flex;
+  justify-content: center;
+}
+.oben{
+  
+ 
+  
+}
+.agregar_objeto{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: 'center'
+}
+/*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<index>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+
+
+.recepcion-section {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.recepcion-section h1 {
+  margin-bottom: 20px;
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 580px;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  
+}
+
+/*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<tabla>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+table {
+  max-width: 500px; /* Define el ancho máximo de la tabla */
+  max-height: 300px; /* Define la altura máxima de la tabla */
+  width: 100%; /* Opcional: establece el ancho inicial de la tabla */
+  overflow: auto; /* Permite desplazarse si se exceden los límites */
+  overflow-y: auto;
+}
+
+
+/*<<<<<<<<<<<<<<<<<<<<<<<<<<<registros>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/* Estilos para la pestaña y el contenido de la pestaña */
+.tab-container {
+  display: flex;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.tab {
+  cursor: pointer;
+  padding: 10px 20px;
+  background-color:#a8d5e5; /* Azul para la pestaña */
+  color: #fff; /* Texto en color blanco */
+  border: 1px solid #a8d5e5; /* Borde azul */
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.tab.active {
+  background-color: #fff; /* Fondo blanco para la pestaña activa */
+  color: #a8d5e5; /* Texto azul para la pestaña activa */
+  
+}
+
+.tab-content {
+  padding: 20px;
+  border: 1px solid#a8d5e5; /* Borde azul para el contenido de la pestaña */
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  background-color: #fff; /* Fondo blanco para el contenido de la pestaña */
+}
+
+.busqueda{
+  background: #a8d5e5;
+  border-radius: 50px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+.ccheckboxs{
+  display: flex;
+  justify-content: center;
+}
+.checkboxs{
+  padding: 10px;
+}
+
+/* Estilos para los selectores */
+.year-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  color: #333; /* Color del texto */
+  background-color: #f0f0f0; /* Color de fondo */
+}
+
+.month-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333; /* Color del texto */
+  background-color: #f0f0f0; /* Color de fondo */
+}
+.fechabuscar{
+  padding: 6px;
+  border-radius: 50px;
+}
+/*--------------------------------------------------------------------------------------------------------------------------------objetos*/
+.contenerdorobjetos{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.tarejta{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;  
+  border: 1px solid #FFFAF9;
+  width: 270px;
+  height: 230px;
+  border-radius: 50px;
+  background: #FFFAF9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  margin-top: 10px;
+  
+}
+.t_nombre{
+  font-size: 30px;
+  text-align: right;
+  color: #a8d5e5;
+}
+.t_cc{
+  font-size: 20px;
+}
+.t_tipo{
+  font-size: 15px;
+}
+.t_botones{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width:100%;
+  padding: 7px;  
+  padding-top: 10px;
+  margin-top: 15px;
+}
+.t_botones button{
+  margin:3px;
+  background: #a8d5e5;
+  padding: 10px;
+  border-radius: 50px;
+  border: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+/*------------------------------------------------------------------------------------------------------------------------------loadin*/
+@import url('//fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,800&display=swap');
+
+/* ======================== */
+.container{   
+  display: grid;
+  place-content: center;
+  height: 50vh;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  background-color: #FFF;
+  color: #00b8de;
+}
+.cargando{
+    width: 120px;
+    height: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+  margin: 0 auto; 
+}
+.texto-cargando{ 
+  padding-top:20px
+}
+.cargando span{
+    font-size: 20px;
+    text-transform: uppercase;
+}
+.pelotas {
+    width: 30px;
+    height: 30px;
+    background-color: #00b8de;
+    animation: salto .5s alternate
+    infinite;
+  border-radius: 50%  
+}
+.pelotas:nth-child(2) {
+    animation-delay: .18s;
+}
+.pelotas:nth-child(3) {
+    animation-delay: .37s;
+}
+@keyframes salto {
+    from {
+        transform: scaleX(1.25);
+    }
+    to{
+        transform: 
+        translateY(-50px) scaleX(1);
+    }
+}
+/*////////////////////////<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+.ensa{
+  display: flex;
+  justify-content: center; 
+  background: #FFFAF9;
+  padding: 5px 10px; 
+  margin: 5px;
+  border-radius: 50px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
