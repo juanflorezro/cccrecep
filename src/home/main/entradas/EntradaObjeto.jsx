@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Home from '../../Home'
-export default function EntradaObjeto(){
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<Variables>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
-    const tokenN = (name) => {
+export default function EntradaObjeto(){ 
+  const tokenN = (name) => {
     const cookies = document.cookie.split('; ')
 
     for (let i = 0; i < cookies.length; i++) {
@@ -17,7 +16,6 @@ export default function EntradaObjeto(){
 
     return null
   }
-  //variables para agregar un objeto
   const [objetoData, setObjetoData] = useState({
     serial: '',
     modelo: '',
@@ -25,79 +23,29 @@ export default function EntradaObjeto(){
     descripcion: '',
     recepcionista: tokenN('cedula')
   })
-  //variables para guardar el onjeto
   const [objetos, setObjetos] = useState([])
-  //variables para mostrar los formularios 
   const [mostrarObjeto, setMostrarObjeto] = useState(true)
   const [ingresarObjeto, setIngresarObjeto] = useState(false)
   const [salidaObjeto, setSalidaObjeto] = useState(false)
-  //variables para agregar una entrada y salida
   const [objeto,setObjeto] = useState(null)
   const [activo,setActivo] = useState('')
-  const [ubicacion, setUbicacion] = useState('Ronda')
   const [fecha, setFecha] = useState(null)
   const [hora,setHora] = useState('')
-  const [tipo, setTipo] = useState('')
+  const [descripcionEntrada, setDescripcionEntrada] = useState('')
   const [tipoObjeto, setTipoObjeto] = useState('Objeto')
-  //variables para mostrar los objetos por en la tabla por paginas 
   const [paginaActual, setPaginaActual] = useState(1)
   const registrosPorPagina = 8
   const indiceInicio = (paginaActual - 1) * registrosPorPagina
   const indiceFin = indiceInicio + registrosPorPagina
   const registrosPaginaActual = objetos.slice(indiceInicio, indiceFin)
-  const [buscar, setBuscar] = useState(null)
-  const handleBuscar = () => {
-    if(buscar){
-      const entrada = {
-        recepcionista: '1234567890',
-        activo: buscar
-      }
-      tablaObjetos(entrada)
-    }else{
-      const entrada = ''
-      tablaObjetos(entrada)
-    }
-    
-    console.log(buscar)
-    
-  }
+  const [buscar, setBuscar] = useState('')
   const [loading, setLoading] = useState(true)
-  const filtroUnicot = {
-    recepcionista: '1234567890'
-  }
   useEffect(()=>{
     tablaObjetos('')
   },[])
-
-  const compararHoraFecha = (a, b) => {
-    // Primero, compara las horas
-   
-    // Si las horas son iguales, compara las fechas
-    const fechaA = new Date(a.fecha);
-    const fechaB = new Date(b.fecha);
-    if (fechaA < fechaB) {
-      return -1;
-    }
-    if (fechaA > fechaB) {
-      return 1;
-    }
-    
-    const horaA = new Date(`2023-01-01 ${a.hora}`);
-    const horaB = new Date(`2023-01-01 ${b.hora}`);
-    if (horaA < horaB) {
-      return -1;
-    }
-    if (horaA > horaB) {
-      return 1;
-    }
-    return 0; // Si las horas y fechas son iguales
-  }
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cargar tabla>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
   const tablaObjetos = (filtroUnico) => {
-    
-    
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/objetos/lista',{filtroUnico},{
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/lista',{filtroUnico},{
       headers: {
         authorization: token
       }
@@ -111,9 +59,9 @@ export default function EntradaObjeto(){
     })
     .catch(err => {
       console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
     })
   }
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<agregar objeto>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setObjetoData((prevData) => ({ ...prevData, [name]: value }))
@@ -121,28 +69,41 @@ export default function EntradaObjeto(){
   const handleAgregarObjeto = (e) => {
     e.preventDefault()
     const token = tokenN('token')
-    console.log(token)
-    var resultado = window.confirm('¿Quieres guardar este Activo? ->> '+objetoData.activo)
-    if (resultado === true) {
-      axios.post('https://express.juanflow04flore.repl.co/objetos/agregar',{objetoData},{
+    
+    Swal.fire({
+      title: '¿Quieres guardar este Activo? \n '+objetoData.activo,
+        
+      showCancelButton: true,
+      confirmButtonText: 'Guardar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/agregar',{objetoData},{
         headers: {
         authorization: token
         }
       })
-      .then(doc => {
-        alert('Activo guardado Correctamente \n <<<<<<<  ' + doc.data.activo + '>>>>>>>>>')
-        console.log(doc.data)
-        tablaObjetos()
-        setMostrarObjeto(true)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-      } else { 
-        window.alert('Accion Cancelada')
+        .then(doc => {
+          
+          console.log(doc.data)
+          tablaObjetos()
+          setMostrarObjeto(true)
+          Swal.fire('Activo guardado Correctamente', '', 'success')
+        })
+        .catch(err => {
+          console.log(err)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+          })
+        })
+        
+      } else if (result.isDenied) {
+        Swal.fire('La Acción Fue Cancelada', '', 'info')
       }
+    })
+    
     }
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<botones para mostrar formularios>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const MostrarAgregar = () => {
     setMostrarObjeto(true)
     setSalidaObjeto(false)
@@ -158,21 +119,38 @@ export default function EntradaObjeto(){
     setActivo(objeto.activo)
     setSalidaObjeto(false)
     setObjeto(objeto)
-    
+    setFecha(null)
+    setHora('')
+    setDescripcionEntrada('')
   }
   const MostrarSalida = (objeto) => {
     setIngresarObjeto(false)
     setSalidaObjeto(true)
+    setObjeto(objeto)
     setActivo(objeto.activo)
+    setFecha(null)
+    setHora('')
+    setDescripcionEntrada('')
   }
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<agregar entrada>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const handleAgregarEntrada = (e) => {
     e.preventDefault()
-
-    console.log(objeto)
-   
-    const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/entradas/agregarEntradaObjeto',{
+    if(fecha === null || hora === ''){
+      Swal.fire({ icon: 'warning', title: 'Por favor...!', text: '¡Ingrese Todos Los Campos!' })
+    }else{
+      Swal.fire({
+      title: '¿Quieres realizar la Entrada a este Activo?',
+      text: "Si ya valido que la informacion es correcta Oprimir 'Agregar Entrada",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Agregar Entrada'
+    })
+      .then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true)
+        const token = tokenN('token')
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/agregarEntradaObjeto',{
           objeto: {
             recepcionista: tokenN('cedula'),
             objeto: objeto,
@@ -180,93 +158,56 @@ export default function EntradaObjeto(){
             hora: hora,
             ubicacion: tokenN('ubicacion'),
             tipo: 'Entrada',
-            tobjeto: tipoObjeto
+            tobjeto: tipoObjeto,
+            descripcion: descripcionEntrada
           }
         },{
-            headers: {
+          headers: {
             authorization: token
           }
-          })
-          .then(doc => {
+        })
+        .then(doc => {
           console.log(doc.data)
-          alert('entrada correcta  '+ doc.data.objeto)
-        })
-          .catch(err => {
-          console.log(err)
-        })
-    /*consultar(objeto)
-    .then( doc => {
-      console.log('entrando')
-      console.log(doc)
-      doc.sort(compararHoraFecha)
-      console.log(doc)
-      console.log(doc[doc.length-1].tipo)
-      limitarEntradas(doc)
-   
-       console.log(doc)
-      console.log(doc[doc.length-1])
-      if(doc[doc.length-1].tipo === 'Entrada'){
-        console.log('la ultima fue una Entrada ')
-        alert('Este activo ya se encuentra dentro de la sede')
-      }else{
-        const token = tokenN('token')
-        console.log(token)
-        var resultado = window.confirm('¿Quieres Ingresar este activo?');
-        if (resultado == true) {
-          axios.post('https://express.juanflow04flore.repl.co/entradas/agregarEntradaObjeto',{
-          objeto: {
-            recepcionista: '1234567890',
-            objeto: objeto,
-            fecha: fecha,
-            hora: hora,
-            ubicacion: ubicacion,
-            tipo: 'Entrada',
-            tobjeto: tipoObjeto
-          }
-        },{
-            headers: {
-            authorization: token
-          }
-          })
-          .then(doc => {
-          console.log(doc.data)
-          alert('entrada correcta  '+ doc.data.objeto)
-        })
-          .catch(err => {
-          console.log(err)
-        })
+          setLoading(false)
           setIngresarObjeto(false)
-        } else { 
-          window.alert('Accion Cancelada');
-        }
+          Swal.fire(
+            '¡Guardado!',
+            'Acción realizada Correctamenete',
+            'success'
+          )
+        })
+        .catch(err => {
+          console.log(err)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+          })
+        })
+        
       }
-      
     })
-    .catch( err => {
-      console.log(err)
-    })*/
-
-    
-    
-    
-    //const date = new Date(fe)
-    //const dia = date.getDate() + 1
-    //const mes = date.getMonth() + 1 // El valor del mes es base 0, por lo que se agrega 1
-    //const anio = date.getFullYear()
-    //alert(dia)
-    //alert(mes)
-    //alert(anio)
+    }
   }
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<agregar salida>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const handleAgregarSalida = (e) => {
     e.preventDefault()
-    
-    console.log(activo)
-    const token = tokenN('token')
-    console.log(token)
-    var resultado = window.confirm('¿Quieres hacer esta Salida?')
-    if (resultado === true) {
-      axios.post('https://express.juanflow04flore.repl.co/entradas/agregarEntradaObjeto',{
+    if(fecha === null || hora === ''){
+      Swal.fire({ icon: 'warning', title: 'Por favor...!', text: '¡Ingrese Todos Los Campos!' })
+    }else{
+      Swal.fire({
+      title: '¿Quieres realizar la Salida a este Activo?',
+      text: "Si ya valido que la informacion es correcta Oprimir 'Agregar Salida",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Agregar Salida'
+    })
+      .then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true)
+        const token = tokenN('token')
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io//entradas/agregarEntradaObjeto',{
         objeto: {
           recepcionista: tokenN('cedula'),
           objeto: objeto,
@@ -274,7 +215,8 @@ export default function EntradaObjeto(){
           hora: hora,
           ubicacion: tokenN('ubicacion'),
           tipo: 'Salida',
-          tobjeto: tipoObjeto
+          tobjeto: tipoObjeto,
+          descripcion: descripcionEntrada
         }
       },{
          headers: {
@@ -283,20 +225,26 @@ export default function EntradaObjeto(){
       })
       .then(doc => {
         console.log(doc.data)
-        alert('Salida correcta  '+ doc.data.objeto)
+        setLoading(false)
+        setSalidaObjeto(false)
+        Swal.fire(
+          '¡Guardado!',
+          'Acción realizada Correctamenete',
+          'success'
+        )
       })
       .catch(err => {
         console.log(err)
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+        })
       })
-        setIngresarObjeto(false)
-    }else { 
-      window.alert('Accion Cancelada')
+      
+      }
+    })
     }
-
-    //const date = new Date(fe)
-    //const dia = date.getDate() + 1
-    //const mes = date.getMonth() + 1 // El valor del mes es base 0, por lo que se agrega 1
-    //const anio = date.getFullYear()
   }
   const buscarObjeto = (buscare) => {
     let filtroUnico
@@ -309,7 +257,7 @@ export default function EntradaObjeto(){
     }
      
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/objetos/lista',{filtroUnico},{
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/lista',{filtroUnico},{
       headers: {
         authorization: token
       }
@@ -323,6 +271,31 @@ export default function EntradaObjeto(){
     })
     .catch(err => {
       console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+    })
+    
+    
+    console.log(buscar)
+  }
+  const buscarObjetos = (object) => {
+    
+     
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/listaN',{object},{
+      headers: {
+        authorization: token
+      }
+    })
+    .then(doc => {
+      console.log(doc.data)
+      const obj = doc.data
+      setObjetos(obj)
+      console.log(objetos)
+      //setLoading(false)
+    })
+    .catch(err => {
+      console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
     })
     
     
@@ -330,17 +303,29 @@ export default function EntradaObjeto(){
   }
   return(
    <>
-     
-    <div style={{  display: "flex", height: '100vh' }}>
+     <div class="contenedor-card-item">
+		      <div class="contenedor-card-item-wrapper">
+		        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9pwuN55xOQq48Ebu_rZKV287ak67N8yjTDQ&usqp=CAU" alt=""/>
+		        <div class="contenedor-info">
+		          <div class="info">
+		            <p class="titulo"></p>
+		            <span class="categoria">Ayuda</span>
+		          </div>
+		          <div class="fondo"></div>
+		        </div>
+		      </div>
+		    </div>
+     <div className = 'mas_vida'></div>
+    <div className = 'camara' style={{  display: "flex", height: '100vh' }}>
        
       <Home />
       {loading && <div style= {{width: '100%'}}>
-        <div class="container">
-          <div class="cargando">
-            <div class="pelotas"></div>
-            <div class="pelotas"></div>
-            <div class="pelotas"></div>
-            <span class="texto-cargando">Cargando...</span>
+        <div className="container">
+          <div className="cargando">
+            <div className="pelotas"></div>
+            <div className="pelotas"></div>
+            <div className="pelotas"></div>
+            <span className="texto-cargando">Cargando...</span>
           </div>
         </div>  
       </div>}
@@ -410,38 +395,51 @@ export default function EntradaObjeto(){
               <>
                 <div style={{display: 'flex', flexDirection: 'column' }}>
                   <div style = {{display: 'flex', flexDirection: 'row'}}>
-                    
-                    <button
-                      onClick={MostrarObtener}
-                      style={{
+                    <button onClick={MostrarObtener} style={{
                         padding: '8px 16px',
                         margin: '10px',
-                        backgroundColor: '#007bff',
-                        color: '#fff',
+                        backgroundColor: 'white',
+                        color: 'black',
                         border: 'none',
                         borderRadius: '4px',
                         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      }}>  Agregar Objeto </button>
+                    <input placeholder='Buscar por # Activo' type="text" value={buscar}
+                      onChange={(e) => {
+                        setBuscar(e.target.value)
+                        buscarObjeto(e.target.value)
                       }}
-                    >
-                      Agregar Objeto
-                    </button>
-                    <input
-                        placeholder='Buscar por # Activo'
-                        type="text"
-                        value={buscar}
-                        onChange={(e) => {
-                            setBuscar(e.target.value)
-                            buscarObjeto(e.target.value)
-                          }
-                        }
                         required
-                        style={{heigth: '10px', padding: '5px 15px', marginBottom: '10px', borderRadius: '50px', border: 'none', textAlign: 'center' }}
+                        style={{
+                          heigth: '10px', 
+                          padding: '5px 15px', 
+                          marginBottom: '10px', 
+                          borderRadius: '50px', 
+                          border: 'none', 
+                          textAlign: 'center' 
+                        }}
                       />
-                    <button onClick={()=>{tablaObjetos('')}} style={{ background: 'none', color: 'black', border: 'none', borderRadius: '50px', padding: '7px 20px',marginLeft: '5px' }}>
+                     <input placeholder='Buscar por Serial' type="text"
+                      onChange={(e) => {
+                        buscarObjetos(e.target.value)
+                      }}
+                        required
+                        style={{
+                          heigth: '10px', 
+                          padding: '5px 15px', 
+                          marginBottom: '10px', 
+                          borderRadius: '50px', 
+                          border: 'none', 
+                          textAlign: 'center' 
+                        }}
+                      />
+                    <button onClick={()=>{tablaObjetos('')}} style={{ background: 'none', color: 'black', border: 'none', borderRadius: '50px',margin: '10px'}}>
                ䷀
             </button>
                   </div>
-                  <div>
+                  <div data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
                     <table style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
                       <thead>
                         <tr>
@@ -455,9 +453,6 @@ export default function EntradaObjeto(){
                             Serial
                           </th>
                           <th style={{ backgroundColor: ' #a8d5e5', color: '#fff', borderBottom: '1px solid #ccc', padding: '8px' }}>
-                            Descripción
-                          </th>
-                          <th style={{ backgroundColor: ' #a8d5e5', color: '#fff', borderBottom: '1px solid #ccc', padding: '8px' }}>
                             ➡
                           </th>
                         </tr>
@@ -468,19 +463,18 @@ export default function EntradaObjeto(){
                             <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.activo}</td>
                             <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.modelo}</td>
                             <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.serial}</td>
-                            <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.descripcion}</td>
                             <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>
                               <button
                                 onClick={() => MostrarIngresar(objeto)}
                                 className="btn btn-danger"
-                                style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px' }}
+                                style={{ backgroundColor: '#f5f5f5', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px' }}
                               >
                                 📥
                               </button>
                               <button 
                                 onClick={() => MostrarSalida(objeto)}
                                 
-                                style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px',marginLeft: '5px' }}
+                                style={{ backgroundColor: '#f5f5f5', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px',marginLeft: '5px' }}
                               > 📤 </button>
                             </td>
                           </tr>
@@ -491,35 +485,17 @@ export default function EntradaObjeto(){
                       <button
                         onClick={() => setPaginaActual(paginaActual - 1)}
                         disabled={paginaActual === 1}
-                        style={{
-                          padding: '8px 16px',
-                          backgroundColor: '#007bff',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '4px',
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                          marginRight: '10px',
-                          cursor: 'pointer',
-                        }}
+                        className='entradaPersona-Paginas'
                       >
-                        Anterior
+                        ⬅
                       </button>
-                      <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#333' }}>{paginaActual}</span>
+                      <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#333', margin:'5px' }}>{paginaActual}</span>
                       <button
                         onClick={() => setPaginaActual(paginaActual + 1)}
                         disabled={indiceFin >= objetos.length}
-                        style={{
-                          padding: '8px 16px',
-                          backgroundColor: '#007bff',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '4px',
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                          marginLeft: '10px',
-                          cursor: 'pointer',
-                        }}
+                        className='entradaPersona-Paginas'
                       >
-                        Siguiente
+                        ➡
                       </button>
                     </div>
                   </div>
@@ -529,16 +505,17 @@ export default function EntradaObjeto(){
             
             {ingresarObjeto && (
               <>
-                <div style={{ textAlign: 'center',  paddingLeft: '20px' }}>
+                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
                 <form onSubmit={handleAgregarEntrada} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
                   <h2 style={{ color: '#333', marginBottom: '20px' }}> Agregar Entrada </h2>
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - </label>
+                  <label htmlFor="Activo" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo} </label>
                   <br />
-                  <input
-                    type="text"
-                    id="seriall"
-                    name="seriall"
-                    value = {activo}
+                  <label htmlFor="ubicacion" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
+                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -546,16 +523,13 @@ export default function EntradaObjeto(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
+                      width: '95%',
+                      textAlign: 'center'
+                    }} 
                   />
                   <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - </label>
-                  <br />
-                  <input
-                    type="text"
-                    id="ubicacion"
-                    name="ubicacion"
-                    value = {ubicacion}
+                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
+                  <input  type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -563,47 +537,20 @@ export default function EntradaObjeto(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%'
                     }}
-                  />
-                  <br /><br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label>
-                  <input
-                    type="date"
-                    id="fecha"
-                    name="fecha"
-                    onChange={(e) => setFecha(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                    
-                  />
-                  <br /><br />
-                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    onChange={(e) => setHora(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                    
-                  />
+                  /><br></br>
+                  <textarea
+                    placeholder='Detalles Especificos De La Entrada'
+                    name="descripcion"
+                    value={descripcionEntrada}
+                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
+                    required
+                    style={{ width: '95%', padding: '8px', marginTop: '10px', borderRadius: '4px', border: '1px solid #ccc', heigth: '200px' }}
+                  ></textarea>
                   
-                  <br /><br />
-                  <input
-                    type="submit"
-                    value="Enviar"
+                  <br />
+                  <input type="submit" value="Enviar"
                     style={{
                       padding: '8px 16px',
                       fontSize: '16px',
@@ -614,8 +561,7 @@ export default function EntradaObjeto(){
                       cursor: 'pointer',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                     }}
-                  />
-                   
+                  />  
                 </form>
                 <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
               </div>
@@ -624,18 +570,28 @@ export default function EntradaObjeto(){
 
             {salidaObjeto &&(
               <>
-                
-                <div style={{ textAlign: 'center',  paddingLeft: '20px' }}>
-                  
-                <form onSubmit={handleAgregarSalida} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
+                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
+                <form onSubmit={handleAgregarSalida} 
+                  style={{
+                    maxWidth: '400px', 
+                    margin: '0 auto', 
+                    backgroundColor: '#f5f5f5', 
+                    padding: '20px', 
+                    borderRadius: '8px', 
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', 
+                    maxHeight: 'calc(100vh - 40px)', 
+                    overflow: 'auto' 
+                  }}
+                > 
                   <h2 style={{ color: '#333', marginBottom: '20px' }}> -Agregar Salida- </h2>
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - </label>
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo}</label>
                   <br />
-                  <input
-                    type="text"
-                    id="seriall"
-                    name="seriall"
-                    value = {activo}
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
+                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -643,64 +599,36 @@ export default function EntradaObjeto(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%'
                     }}
                   />
                   <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - </label>
+                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
+                  <input type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%'
+                    }}
+                  />
                   <br />
-                  <input
-                    type="text"
-                    id="ubicacion"
-                    name="ubicacion"
-                    value = {ubicacion}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                  <textarea placeholder='Detalles Especificos De La Salida' name="descripcion" value={descripcionEntrada}
+                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
+                    required
+                    style={{ 
+                      width: '95%', 
+                      padding: '8px', 
+                      marginTop: '10px', 
+                      borderRadius: '4px', 
+                      border: '1px solid #ccc', 
+                      heigth: '200px' 
                     }}
-                  />
-                  <br /><br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label>
-                  <input
-                    type="date"
-                    id="fecha"
-                    name="fecha"
-                    onChange={(e) => setFecha(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                    
-                  />
-                  <br /><br />
-                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    onChange={(e) => setHora(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                    
-                  />
-                  
-                  <br /><br />
-                  <input
-                    type="submit"
-                    value="Enviar"
+                  ></textarea>
+                  <input type="submit" value="Enviar"
                     style={{
                       padding: '8px 16px',
                       fontSize: '16px',
@@ -711,7 +639,7 @@ export default function EntradaObjeto(){
                       cursor: 'pointer',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                     }}
-                    
+                    required
                   />
                 </form>
                 <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
