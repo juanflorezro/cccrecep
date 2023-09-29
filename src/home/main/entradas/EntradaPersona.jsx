@@ -422,18 +422,7 @@ export default function EntradaPersona(){
     
   return(
    <>  
-     <div class="contenedor-card-item">
-		      <div class="contenedor-card-item-wrapper">
-		        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9pwuN55xOQq48Ebu_rZKV287ak67N8yjTDQ&usqp=CAU" alt=""/>
-		        <div class="contenedor-info">
-		          <div class="info">
-		            <p class="titulo"></p>
-		            <span class="categoria">Ayuda</span>
-		          </div>
-		          <div class="fondo"></div>
-		        </div>
-		      </div>
-		    </div>
+     
     <div className = 'mas_vida'></div>
     <div style={{  display: "flex", height: '100vh' }}>
       <Home />
