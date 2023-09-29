@@ -3,7 +3,7 @@ import Home from '../../Home'
 export default function Index(){
   return(
    <>
-     <div class="contenedor-card-item">
+     <div className="contenedor-card-item">
 		      <div className="contenedor-card-item-wrapper">
 		        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9pwuN55xOQq48Ebu_rZKV287ak67N8yjTDQ&usqp=CAU" alt=""/>
 		        <div className="contenedor-info">
