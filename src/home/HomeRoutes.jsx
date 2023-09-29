@@ -5,7 +5,7 @@ import EntradaObjeto from './main/entradas/EntradaObjeto'
 import ProtectedRoutes from './protectedRoutes/ProtectedRoutes'
 import Index from "./main/index/Index"
 import Tab from './main/registros/navegacion'
-
+import About from './About'
 
 export default function HomeRoutes(){
   return(
@@ -13,9 +13,9 @@ export default function HomeRoutes(){
       <Routes>
         <Route element={<ProtectedRoutes canActive ={true} />}>
           <Route path = '/' element = {<Index/>}/>
-          <Route path = '/main/entradaPersona' element = {<EntradaPersona/>}/>
-          <Route path = '/main/entradaObjeto' element = {<EntradaObjeto />}/>
-          <Route path = '/main/registros' element = {<Tab/>}/>
+          <Route path="/main/entradaPersona" element = {<EntradaPersona />}/>
+          <Route path="/main/entradaObjeto" element = {<EntradaObjeto />}/>
+          <Route path="/main/registros" element = {<Tab/>} />
         </Route>
       </Routes>
     </>
