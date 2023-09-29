@@ -4,14 +4,14 @@ export default function Index(){
   return(
    <>
      <div class="contenedor-card-item">
-		      <div class="contenedor-card-item-wrapper">
+		      <div className="contenedor-card-item-wrapper">
 		        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9pwuN55xOQq48Ebu_rZKV287ak67N8yjTDQ&usqp=CAU" alt=""/>
-		        <div class="contenedor-info">
-		          <div class="info">
-		            <p class="titulo"></p>
-		            <span class="categoria">Ayuda</span>
+		        <div className="contenedor-info">
+		          <div className="info">
+		            <p className="titulo"></p>
+		            <span className="categoria">Ayuda</span>
 		          </div>
-		          <div class="fondo"></div>
+		          <div className="fondo"></div>
 		        </div>
 		      </div>
 		    </div>
