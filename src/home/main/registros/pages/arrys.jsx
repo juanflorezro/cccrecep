@@ -41,7 +41,7 @@ export default function Arrys() {
     .then(doc => { 
       console.log(doc)
       setProyectos(doc.data)
-      setPorcentage(porcentage => porcentage + 20)
+      setPorcentage(porcentage => porcentage + 40)
       listarVisitas()
     })
     .catch(err => {
@@ -64,7 +64,7 @@ export default function Arrys() {
     .then(doc => { 
       console.log(doc)
       setVisitas(doc.data)
-      setPorcentage(porcentage => porcentage + 15)
+      setPorcentage(porcentage => porcentage + 45)
       listarContratistas()
     })
     .catch(err => {
