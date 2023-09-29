@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx/xlsx.mjs'
 import ExcelJS from 'exceljs'
+import AOS from 'aos'
 export default function EntradasSalidas(){
   const [entradasSalidas, setEntradasSalidas] = useState([])
   const [activeField, setActiveField] = useState(null)
-  const [tipo, setTipo] = useState(null)
+  const [tipo, setTipo] = useState('')
   const [objetos, setObjetos] = useState([])
   const [fecha, setFecha] = useState({
     dia: '',
@@ -37,39 +38,16 @@ export default function EntradasSalidas(){
         hora: objetos[x].hora,
         ubicacion: objetos[x].ubicacion,
         tipo: objetos[x].tipo,
-        tobjeto: objetos[x].tobjeto,
-        __v: objetos[x].__v,
+        descripcion: objetos[x].descripcion,
       }
       newObjetoExport.push(newObjetos)
     }
-    
-    /*const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['_id', 'recepcionista', 'objeto_activo', 'objeto_descripcion', 'objeto_modelo', 'objeto_serial', 'fecha', 'hora', 'ubicacion', 'tipo', 'tobjeto', '__v'],
-      ...newObjetoExport.map(item => [
-        item._id,
-        item.recepcionista,
-        item.objeto_activo,
-        item.objeto_descripcion,
-        item.objeto_modelo,
-        item.objeto_serial,
-        item.fecha,
-        item.hora,
-        item.ubicacion,
-        item.tipo,
-        item.tobjeto,
-        item.__v,
-      ])
-    ]);
-    XLSX.utils.book_append_sheet(wb, ws, 'Datos');
-
-    XLSX.writeFile(wb, 'datos.xlsx');*/
 
      const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Entrada Y Salida De Objetos')
 
     // Agregar encabezados
-    const headers = ['_idEntradas', 'recepcionista', 'objeto_activo', 'objeto_descripcion', 'objeto_modelo', 'objeto_serial', 'fecha', 'hora', 'ubicacion', 'tipo', 'tobjeto', '__v']
+    const headers = ['_idEntradas', 'recepcionista', 'Numero De Activo', 'Descripción Caracteristicas', 'Modelo', 'Serial', 'Fecha', 'Hora', 'Ubicacion', 'Tipo', 'Descripción Física']
     worksheet.addRow(headers)
 
     // Agregar datos
@@ -136,7 +114,8 @@ export default function EntradasSalidas(){
         v_usuario_cedula: parseInt(entradasSalidas[x].objeto.usuario.cedula),
         v_usuario_telefono: parseInt(entradasSalidas[x].objeto.usuario.telefono),
         v_empresa: entradasSalidas[x].objeto.empresa,
-        v_tipo: entradasSalidas[x].objeto.tipo,
+        v_tipo: entradasSalidas[x].tipo_v,
+        d_tipo: entradasSalidas[x].descripcion,
         recepcionista: parseInt(entradasSalidas[x].recepcionista),
         tipo: entradasSalidas[x].tipo,
         fecha: entradasSalidas[x].fecha,
@@ -147,7 +126,7 @@ export default function EntradasSalidas(){
     }
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Entrada Y Salida De Personas')
-    const headers = ['_idEntradas', ' v_usuario_nombre', 'v_usuario_apellido', 'v_usuario_tcedula', 'v_usuario_cedula', 'v_usuario_telefono', 'v_empresa', 'v_tipo', 'recepcionista', 'tipo', 'fecha','hora', 'ubicacion']
+    const headers = ['_idEntradas', 'Nombre', 'Apellido', 'Documenuto', 'Cedula', 'Telefono', 'Empresa', 'Tipo de E/S','Descripción', 'Recepcionista', 'Tipo', 'Fecha','Hora', 'ubicación']
     worksheet.addRow(headers)
     newPersonasExport.forEach(item => {
       worksheet.addRow(Object.values(item))
@@ -202,34 +181,141 @@ export default function EntradasSalidas(){
     URL.revokeObjectURL(url);
   }
   const compararHoraFecha = (a, b) => {
-    // Primero, compara las horas
-   
-    // Si las horas son iguales, compara las fechas
-    const fechaA = new Date(a.fecha);
-    const fechaB = new Date(b.fecha);
-    if (fechaA < fechaB) {
-      return -1;
-    }
-    if (fechaA > fechaB) {
-      return 1;
-    }
-    
-    const horaA = new Date(`2023-01-01 ${a.hora}`);
-    const horaB = new Date(`2023-01-01 ${b.hora}`);
-    if (horaA < horaB) {
-      return -1;
-    }
-    if (horaA > horaB) {
-      return 1;
-    }
-    return 0; // Si las horas y fechas son iguales
+      // Primero, compara las horas
+     
+      // Si las horas son iguales, compara las fechas
+      const fechaA = new Date(a.fecha);
+      const fechaB = new Date(b.fecha);
+      if (fechaA < fechaB) {
+        return 1; // Cambia -1 a 1 para invertir el orden
+      }
+      if (fechaA > fechaB) {
+        return -1; // Cambia 1 a -1 para invertir el orden
+      }
+      
+      const horaA = new Date(`2023-01-01 ${a.hora}`);
+      const horaB = new Date(`2023-01-01 ${b.hora}`);
+      if (horaA < horaB) {
+        return 1; // Cambia -1 a 1 para invertir el orden
+      }
+      if (horaA > horaB) {
+        return -1; // Cambia 1 a -1 para invertir el orden
+      }
+      return 0; // Si las horas y fechas son iguales
   }
+  const [ccid, setCcid] = useState(null)
+  const [editar, setEditar] = useState(false)
+  const [editarObjeto, setEditarObjeto] = useState(false)
+  const [personaEditar, setPersonaEditar]= useState(null)
+  const [objetoEditar, setObjetoEditar] = useState(null)
+  const [loading, setLoading] = useState(false)
   useEffect(()=>{
-    tablaObjetos('')
+    tablaObjetos(tokenN('ubicacion'))
+    setCcid(tokenN('cedula'))
+    tablaES()
+    AOS.init()
   },[])
+  const handleEditarPersona = (campo, valor) => {
+    // Copia el objeto personaEditar y actualiza el campo específico
+    const personaEditada = { ...personaEditar, [campo]: valor }
+    setPersonaEditar(personaEditada)
+  }
+  const handleEditar = (e) => {
+    e.preventDefault()
+    console.log(personaEditar)
+    const token = tokenN('token')
+    setLoading(true)
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/editarEntradaSalidaPersona',{personaEditar},{ headers: { authorization: token } })
+    .then(doc => {
+      Swal.fire('¡Editado!',doc.data.tipo+' Editada Correctamente','success')
+      buscar() 
+      setEditar(false)
+      setLoading(false)
+    })
+    .catch(err => {
+      setLoading(false)
+      console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+    })
+  }
+  const handleEditarObjeto = (campo, valor) => {
+    const objetoEditada = { ...objetoEditar, [campo]: valor }
+    setObjetoEditar(objetoEditada)
+  }
+  const handleEditarO = (e) => {
+    e.preventDefault()
+    console.log(objetoEditar)
+    const token = tokenN('token')
+    setLoading(true)
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/editarEntradaSalidaObjeto',{objetoEditar},{ headers: { authorization: token } })
+    .then(doc => {
+      Swal.fire('¡Editado!',doc.data.tipo+' Editada Correctamente','success')
+      buscar()
+      setEditarObjeto(false)
+      setLoading(false)
+    })
+    .catch(err => {
+      setLoading(false)
+      console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+    })
+  }
+  const eliminarEntradaPersona = (EntradaEliminar) => {
+    const token = tokenN('token')  
+    Swal.fire({
+      title: '¿Quieres Eliminar Esta '+EntradaEliminar.tipo+'?',
+      text: "¡Cuidado No Se Recuperaran Los Cambios Una Ves Realizados",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/eliminarEntradaSalida',{EntradaEliminar},{ headers: { authorization: token } })
+        .then(doc => {
+          Swal.fire('¡Eliminada!',doc.data.tipo+' Eliminada Correctamente','success')
+          buscar()
+          
+        })
+        .catch(err => {
+          console.log(err)
+          Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+        })
+      }
+    })
+    
+  }
+  const eliminarEntradaObjeto = (EntradaEliminar) => {
+    const token = tokenN('token')  
+    Swal.fire({
+      title: '¿Quieres Eliminar Esta '+EntradaEliminar.tipo+'?',
+      text: "¡Cuidado No Se Recuperaran Los Cambios Una Ves Realizados",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //setLoading(true)
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/eliminarEntradaSalidaObjeto',{EntradaEliminar},{ headers: { authorization: token } })
+        .then(doc => {
+          Swal.fire('¡Eliminada!',doc.data.tipo+' Eliminada Correctamente','success')
+          buscar()
+          //setLoading(false)
+        })
+        .catch(err => {
+          //setLoading(false)
+          console.log(err)
+          Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+        })
+      }
+    })
+    
+  }
   const tokenN = (name) => {
     const cookies = document.cookie.split('; ')
-
     for (let i = 0; i < cookies.length; i++) {
       const cookieParts = cookies[i].split('=')
       const cookieName = cookieParts[0]
@@ -242,40 +328,43 @@ export default function EntradasSalidas(){
 
     return null
   }
-  const tablaObjetos = (filtroUnico) => {
-     //setLoading(true)
+  const tablaObjetos = (ubicacion) => {
+     setLoading(true)
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/entradas/obtenerEntradaSalidaObjeto',{filtroUnico},{
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaObjeto',{ubicacion},{
       headers: {
         authorization: token
       }
     })
     .then(doc => {
-      console.log(doc.data)
       const obj = doc.data.sort(compararHoraFecha)
       setObjetos(obj)
-      //setLoading(false)
-      console.log(objetos)
+      setLoading(false)
     })
     .catch(err => {
       console.log(err)
+      setLoading(false)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
     })
   }
   const tablaES = () => {
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/entradas/obtenerEntradaSalidaPersona',{},{
+    const ubicacion = tokenN('ubicacion')
+    setLoading(true)
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaPersona',{ubicacion},{
       headers: {
         authorization: token
       }
     })
     .then(doc => {
-      console.log(doc.data)
       const es = doc.data.sort(compararHoraFecha)
       setEntradasSalidas(es)
-      console.log(es)  
+      setLoading(false)
     })
     .catch(err => {
+      setLoading(false)
       console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
     })
   }
   const handleFechaChange = (field, value) => {
@@ -285,62 +374,73 @@ export default function EntradasSalidas(){
   }));
 }
   const buscar = () => {
-    console.log(tipo)
-    console.log(fecha.año)
-    console.log(fecha.mes)
-    console.log(fecha.dia)
-    console.log(usuarioId.cedula)
-    console.log(activeField)
-    
+    console.log(fecha)
+    console.log(usuarioId)
     const token = tokenN('token')
-    if(tipo === 'Persona'){
-      axios.post('https://express.juanflow04flore.repl.co/entradas/obtenerEntradaSalidaPersonaUnica',{usuarioId,fecha},{
-        headers: {
-          authorization: token
-        }
-      })
-      .then(doc => {
-          console.log(doc.data)
-          const es = doc.data.sort(compararHoraFecha)
-          setEntradasSalidas(es)
-          console.log(es)  
-        })
-      .catch(err => {
-          console.log(err)
-        })
+    if(fecha.dia === '' && fecha.mes === '' && fecha.año === '' && usuarioId.cedula === ''){
+      tablaES()
+      tablaObjetos(tokenN('ubicacion'))
     }else{
+      if(tipo === 'Persona'){
+        const ubicacion = tokenN('ubicacion')
+        setLoading(true)
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaPersonaUnica',{usuarioId,fecha,ubicacion},{
+          headers: {
+            authorization: token
+          }
+        })
+        .then(doc => {
+          setLoading(false)
+            console.log(doc.data)
+            const es = doc.data.sort(compararHoraFecha)
+            setEntradasSalidas(es)
+            console.log(es)  
+        })
+        .catch(err => {
+          setLoading(false)
+            console.log(err)
+            Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+          })
+      }
+      else{
       if(tipo === 'Activo'){
         let objetoId = {
           activo: usuarioId.cedula
         }
-        axios.post('https://express.juanflow04flore.repl.co/entradas/obtenerEntradaSalidaObjetoUnico',{objetoId,fecha},{
+        const ubicacion = tokenN('ubicacion')
+        setLoading(true)
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaObjetoUnico',{objetoId,fecha,ubicacion},{
         headers: {
           authorization: token
         }
       })
         .then(doc => {
+          setLoading(false)
             console.log(doc.data)
             const es = doc.data.sort(compararHoraFecha)
             setObjetos(es)
             console.log(es)  
           })
         .catch(err => {
+          setLoading(false)
             console.log(err)
+            Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
           })
       }
       
     }
-    
+    }
     
   }
   return(
     <>
-        <div className = 'busqueda'>
+      
+      <div className = 'busqueda'>
            <div className = 'ccheckboxs'>
             <div className='checkboxs'>
               <select className="year-select" value={tipo}  onChange={(e) => setTipo(e.target.value)} >
-                <option value = ''>Seleccionar</option>
-                <option value= 'Persona'>Persona</option>
+                <option value = '' >Seleccionar</option>
+                <option value =  'Persona'>Persona</option>
                 <option value = 'Activo'>Activo</option>
               </select>
             </div>
@@ -420,14 +520,38 @@ export default function EntradasSalidas(){
                 let m
                 if(date.getDate()+1 === 32){
                   d = date.getDate() - 30
-                   m = date.getMonth() + 2
-                }else{ 
+                  m = date.getMonth() + 2
+                  if(d>9 && m>9){
+                    const a = date.getFullYear()
+                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})                  
+                  }else{
+                    if(d>9 && m<10){
+                      const a = date.getFullYear()
+                      setFecha({dia: ''+d, mes: '0'+m, año: ''+a})
+                    }else{
+                      const a = date.getFullYear()
+                      setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
+                    }
+                    
+                  }
+                }
+                else{ 
                   d = date.getDate()+1
                    m = date.getMonth() + 1
+                  if(d>9 && m>9){
+                    const a = date.getFullYear()
+                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})                  
+                  }else{
+                    if(d>9 && m<10){
+                      const a = date.getFullYear()
+                      setFecha({dia: ''+d, mes: '0'+m, año: ''+a})
+                    }else{
+                      const a = date.getFullYear()
+                      setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
+                    }
+                    
+                  }
                 }
-                
-                const a = date.getFullYear()
-                setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
               }}/>}
             </div>
             <div className='checkboxs'>
@@ -439,64 +563,300 @@ export default function EntradasSalidas(){
               </button>
             </div>
           </div>
-        </div>         
-        {tipo === 'Persona' && <div>
-          <div style = {{display: 'flex', justifyContent: 'center', marginTop: '10px'}}>
-          <button onClick={()=>descargarPersonas(entradasSalidas)} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' }}>
+        </div>
+      {loading && <div>
+        <div className="container">
+          <div className="cargando">
+            <div className="pelotas"></div>
+            <div className="pelotas"></div>
+            <div className="pelotas"></div>
+            <span className="texto-cargando">Cargando...</span>
+          </div>
+        </div>  
+      </div>}
+      {!loading && <>    
+        {tipo === 'Persona' && <div style={{ overflowX: 'auto', maxHeight: '500px' }} data-aos="zoom-in">
+          {!editar === true ? 
+            <div>
+            <div style = {{display: 'flex', justifyContent: 'center', marginTop: '10px'}}>
+          <button onClick={()=>descargarPersonas(entradasSalidas)} style={{ 
+              backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' 
+            }}>
                 Descargar todas las entradas y salidas seleccionadas de Personas
           </button>
         </div>
-          <div style = {{display: 'flex', flexDirecton: 'row', justifyContent: 'center', marginTop: '10px'}}>    
-          <div >
-            { entradasSalidas.map((entradasalida, index) => (
-                <>
-                  <div className = 'ensa' style = {{ textAlign: 'center', background: entradasalida.tipo === 'Entrada' ? '#3EFF00' : '#FF2D2D' }}>
+            <div style = {{
+              display: 'flex', flexDirecton: 'row', justifyContent: 'center', marginTop: '10px', background: 'linear-gradient( white,99.975%, #a8d5e5)', borderRadius: '50px' 
+            }}>   
+                  <div >
+            { entradasSalidas.map((entradasalida) => (
+                <div key={entradasalida._id}>
+                  <div  className = 'ensa' style = {{ textAlign: 'center', background: entradasalida.tipo === 'Entrada' ? '#B5FE57' : '#FFACAC' }}>
                     <div  style = {{  padding: '10px', flex: '1', textAlign: 'left' }}>{entradasalida.tipo}</div>
                     <div className = 'ensa'> 
                       <label style = {{flex: '1', margin: '5px'}}>{entradasalida.objeto.usuario.cedula}</label>
-                      <label style = {{flex: '1', margin: '5px'}}> {entradasalida.objeto.tipo}</label>
+                      <label style = {{flex: '1', margin: '5px'}}> {entradasalida.tipo === 'Entrada' ? entradasalida.tipo_v : '>>>>' }</label>
                       <label style = {{flex: '4', margin: '5px'}}> {entradasalida.fecha} {entradasalida.hora}</label>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}}>📄</button>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}}>✍</button>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}}>✂</button>
+                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick={() => Swal.fire('>>>>> '+ entradasalida.tipo + ' <<<<<'+'\n\n'+entradasalida.objeto.usuario.nombre+' '+entradasalida.objeto.usuario.apellido+' \n'+entradasalida.objeto.usuario.tcedula+' '+entradasalida.objeto.usuario.cedula+'\n📅'+entradasalida.fecha+' 🕐   '+entradasalida.hora+'\nRECEPCIONISTA: '+ entradasalida.recepcionista+'\nUbicación: '+entradasalida.ubicacion + '\nMotivo: '+entradasalida.tipo_v+'\n'+entradasalida.descripcion)} >📄</button>
+                      <div style = {{display: ccid === entradasalida.recepcionista   ? 'block': 'none'}}>
+                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick={()=>{
+                          setEditar(true)
+                          setPersonaEditar(entradasalida)
+                        }}>✍</button>
+                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick = {() => eliminarEntradaPersona(entradasalida)}>✂</button>
+                      </div>
                     </div>
                   </div>
-                </>
+                </div>
               ))  
             }
           </div>
+               
+                
         </div>    
-          
+          </div> 
+          : 
+            <div>
+            <>
+              <div style={{ textAlign: 'center', paddingLeft: '20px', marginTop: '10px' }}>
+                <form onSubmit={handleEditar} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto'}}> 
+                  <h2 style={{ color: '#333', marginTop: '5px' }}> Editar {personaEditar.tipo} </h2>
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Cedula: #️⃣ - {personaEditar.objeto.usuario.cedula}</label>
+                  
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {personaEditar.ubicacion}</label>
+                  
+                  <br></br>
+                  {personaEditar.tipo === 'Entrada' && <div>
+                    <select name="tipo" value = {personaEditar.tipo_v} onChange={(e) => handleEditarPersona('tipo_v', e.target.value)} required
+                      style={{
+                        width:'85%', 
+                        padding: '8px', 
+                        marginBottom: '3px', 
+                        borderRadius: '4px', 
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        border: '1px solid #ccc', 
+                        textAlign: 'center'
+                      }}
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="Proyecto">Proyectos</option>
+                      <option value="Contratista">Contratistas</option>
+                      <option value="Visita">Visitas</option>
+                    </select> 
+                    <br />
+                  </div>} 
+                  <br></br>
+                  {personaEditar.tipo_v === 'Proyecto' && <div>
+                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
+                      style={{
+                        width:'80%', 
+                        padding: '8px', 
+                        marginBottom: '3px', 
+                        borderRadius: '4px', 
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        border: '1px solid #ccc' }}
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="Reactivate INN">Reactivate INN</option>
+                      <option value="Impulsa">Impulsa</option>
+                      <option value="Coworking">Coworking</option>
+                      <option value="otro">otro</option>
+                    </select>
+                  </div>}
+                  {personaEditar.tipo_v === 'Contratista' && <div>
+                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
+                      style={{
+                        width:'80%', 
+                        padding: '8px', 
+                        marginBottom: '3px', 
+                        borderRadius: '4px', 
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        border: '1px solid #ccc' }}
+                    >
+                      <option value="">Selecionar</option>
+                      <option value="Mantenimiento a equipos">Mantenimiento a equipos</option>
+                      <option value="Reparación">Reparación</option>
+                      <option value="otro">otro</option>
+                    </select>
+                  </div>}
+                  {personaEditar.tipo_v === 'Visita' && <div>
+                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
+                      style={{
+                        width:'80%', 
+                        padding: '8px', 
+                        marginBottom: '3px', 
+                        borderRadius: '4px', 
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        border: '1px solid #ccc' }}
+                    >
+                      <option value="">Selecionar</option>
+                      <option value="Conferencia">Conferencia</option>
+                      <option value="Juntas">Juntas</option>
+                      <option value="otro">otro</option>
+                    </select>
+                  </div>}
+                  <label htmlFor="fecha" style={{ fontSize: '18px', color: '#555' }}>Fecha: </label><br></br>
+                  
+                  <input
+                    type="date"
+                    id="fecha"
+                    name="fecha"
+                    value = {personaEditar.fecha}
+                    onChange={(e) => handleEditarPersona('fecha', e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width:'80%',
+                      textAlign: 'center'
+                    }}
+                    
+                  />
+                  <br />
+                  <label htmlFor="time" style={{ fontSize: '18px', color: '#555', borderTop: '0px'}}>Hora:  </label><br></br>
+                  <input
+                    type="time"
+                    id="time"
+                    name="time"
+                    value={personaEditar.hora}
+                    onChange={(e) => handleEditarPersona('hora', e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width:'80%',
+                      textAlign: 'center'
+                    }}
+                    
+                  />
+                  <br /><br />
+                  <input type="submit" value="Editar"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '16px',
+                      backgroundColor: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    }}
+                  />
+                   
+                </form>
+                <button onClick={() => setEditar(false)} style={{border: 'none', background: 'none', marginLeft: '0px'}} >❌</button>
+              </div>
+            </>
+          </div>
+          }
         </div>}
-        {tipo === 'Activo' && <div>
-          <div style = {{display: 'flex', justifyContent: 'center', marginTop: '10px'}}>
-          <button onClick={()=>descargarObjetos(objetos)} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' }}>
+        {tipo === 'Activo' && <div style={{ overflowX: 'auto', maxHeight: '500px' }} data-aos="zoom-in">
+          {!editarObjeto === true ? 
+            <div>
+               <div style = {{display: 'flex', justifyContent: 'center', marginTop: '10px'}}>
+            <button onClick={()=>descargarObjetos(objetos)} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' }}>
                 Descargar todas las entradas y salidas seleccionadas de Objetos
           </button>
-        </div>
-          <div style = {{display: 'flex', flexDirecton: 'row', justifyContent: 'center', marginTop: '10px'}}>    
-          <div >
-            { objetos.map((objeto, index) => (
-                <>
-                  <div className = 'ensa' style = {{ textAlign: 'center', background: objeto.tipo  === 'Entrada' ? '#3EFF00' : '#FF2D2D', display: 'flex' }}>
+          </div>
+              <div style = {{display: 'flex', flexDirecton: 'row', justifyContent: 'center', marginTop: '10px'}}>    
+            <div >
+            { objetos.map((objeto) => (
+                <div key = {objeto._id}>
+                  <div className = 'ensa'  style = {{ textAlign: 'center', background: objeto.tipo  === 'Entrada' ? '#B5FE57' : '#FFACAC', display: 'flex' }}>
                     <div  style = {{  padding: '10px', flex: '1' }}>{objeto.tipo}</div>
                     <div className = 'ensa'> 
                       <label style = {{flex: '1', margin: '5px'}}>{objeto.objeto.activo}</label>
                       <label style = {{flex: '1', margin: '5px'}}> {objeto.objeto.serial}</label>
                       <label style = {{flex: '4', margin: '5px'}}> {objeto.fecha} {objeto.hora}</label>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}}>📄</button>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}}>✍</button>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}}>✂</button>
+                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick={() => Swal.fire('>>>>> '+ objeto.tipo + ' <<<<<'+'\n\n'+'Activo: '+objeto.objeto.activo+'\nSerial: '+objeto.objeto.serial+'\nModelo: '+objeto.objeto.modelo+'\n📅 '+objeto.fecha+' 🕐   '+objeto.hora+'\nRECEPCIONISTA: '+objeto.recepcionista+'\nUbicación: '+objeto.ubicacion+'\nDescripción: '+objeto.descripcion)}>📄</button>
+                      <div style = {{display: objeto.recepcionista === ccid ? 'block': 'none'}}>
+                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px', filter: 'none'}} onClick = {()=>{
+                          setEditarObjeto(true)
+                          setObjetoEditar(objeto)
+                        }}>✏️</button>
+                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick = {()=>eliminarEntradaObjeto(objeto)}>✂</button>
+                      </div>
+                      
                     </div>
                   </div>
-                </>
+                </div>
               ))  
             }
           </div>
-        </div>    
-        
+          </div>
+            </div>
+          :
+            <div>
+                <div style={{ textAlign: 'center',  paddingLeft: '20px', marginTop: '10px'}}>
+                <form onSubmit={handleEditarO} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
+                  <h2 style={{ color: '#333', marginBottom: '20px' }}> Editar {objetoEditar.tipo} </h2>
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {objetoEditar.objeto.activo}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {objetoEditar.ubicacion}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
+                  <input type="date" id="fecha" name="fecha" value = {objetoEditar.fecha} onChange={(e) => handleEditarObjeto('fecha', e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%',
+                      textAlign: 'center'
+                    }}
+                  />
+                  <br />
+                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
+                  <input type="time" id="time" name="time" value = {objetoEditar.hora} onChange={(e) => handleEditarObjeto('hora', e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%',
+                      textAlign: 'center'
+                    }}
+                  />
+                  <br />
+                  <textarea
+                    placeholder='Detalles Especificos De La Entrada'
+                    name="descripcion"
+                    value={objetoEditar.descripcion}
+                    onChange={(e) => handleEditarObjeto('descripcion', e.target.value)}
+                    required
+                    style={{ width: '95%', padding: '8px', marginTop: '10px', borderRadius: '4px', border: '1px solid #ccc', heigth: '200px', textAlign: 'center' }}
+                  ></textarea><br></br>
+                  <input type="submit" value="Editar"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '16px',
+                      backgroundColor: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',  
+                    }}
+                  />
+                   
+                </form>
+                <button onClick={()=>setEditarObjeto(false)} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px'}}>❌</button>
+              </div>
+              </div>
+          }
         </div>}
-        
+      </>}
     </>
   )
 }
