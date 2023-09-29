@@ -41,29 +41,34 @@ export default function Home() {
   
   return(
     <>
+      <div style = {{display: 'flex', width: '8rem'}}>
       
-     <Sidebar className="app">
-  <Menu>
-    <MenuItem className="menu1" component={<Link to="/" className="link" />}>
-      <h2>Menu</h2>
+      
+     <Sidebar  className = 'sidebar' style ={{ border: 'none'}} >
+  <Menu style ={{display: 'flex'}}>
+    <MenuItem className="menu1" title = 'Inicio' component={<Link to="/"  />}>
+      <h2 ></h2><h6>{tokenN('ubicacion') ==='Centro' ? '🏫' : '🏢'} {tokenN('ubicacion').toUpperCase()}</h6>
+
+      
     </MenuItem>
-    <SubMenu label="⬆⬇ Gestión E/S">
-      <MenuItem component={<Link to="/main/entradaPersona" className="link" />}>
+    <SubMenu label="⬆⬇" title = 'Gestión De Entradas y Salidas' >
+      <MenuItem  component={<Link to="/main/entradaPersona" />}>
         Persona
       </MenuItem>
-      <MenuItem component={<Link to="/main/entradaObjeto" className="link" />}>
+      <MenuItem component={<Link to="/main/entradaObjeto" />}>
         Objeto
       </MenuItem>
     </SubMenu>
-    <MenuItem component={<Link to="/main/registros" className="link" />} >📂 Historial</MenuItem>
+    <MenuItem title = 'Registros' component={<Link to="/main/registros" />} >📂</MenuItem>
   </Menu>
   <div className="sidebar-bottom">
     <Menu>
-      <MenuItem>🟢 {nombre}</MenuItem>
-      <MenuItem onClick={() => cerrarSesion()}>⭕ Cerrar Sesión </MenuItem>
+      <MenuItem title = {nombre}>🟢</MenuItem>
+      <MenuItem title = 'Cerrar Sesión' onClick={() => cerrarSesion()}>⭕</MenuItem>
     </Menu>
   </div>
 </Sidebar>
+        </div>
     </>
   )
 }
