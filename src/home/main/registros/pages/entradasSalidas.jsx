@@ -1,321 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import * as XLSX from 'xlsx/xlsx.mjs'
-import ExcelJS from 'exceljs'
-import AOS from 'aos'
-export default function EntradasSalidas(){
-  const [entradasSalidas, setEntradasSalidas] = useState([])
-  const [activeField, setActiveField] = useState(null)
-  const [tipo, setTipo] = useState('')
-  const [objetos, setObjetos] = useState([])
-  const [fecha, setFecha] = useState({
-    dia: '',
-    mes: '',
-    año: ''
-  })
-  const [usuarioId, setUsuarioId] = useState({
-    cedula: ''
-  })
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target
-    setActiveField(checked ? name : null)
-    setFecha({
-      dia: '',
-      mes: '',
-      año: ''
-    })
-  }
-  const descargarObjetos = async (objetos) => {
-    let newObjetoExport = []
-    for(let x = 0;  x < objetos.length ; x++){
-      let newObjetos= {
-        _id: objetos[x]._id,
-        recepcionista: objetos[x].recepcionista,
-        objeto_activo: objetos[x].objeto.activo,
-        objeto_descripcion: objetos[x].objeto.descripcion,
-        objeto_modelo: objetos[x].objeto.modelo,
-        objeto_serial: objetos[x].objeto.serial,
-        fecha: objetos[x].fecha,
-        hora: objetos[x].hora,
-        ubicacion: objetos[x].ubicacion,
-        tipo: objetos[x].tipo,
-        descripcion: objetos[x].descripcion,
-      }
-      newObjetoExport.push(newObjetos)
-    }
-
-     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('Entrada Y Salida De Objetos')
-
-    // Agregar encabezados
-    const headers = ['_idEntradas', 'recepcionista', 'Numero De Activo', 'Descripción Caracteristicas', 'Modelo', 'Serial', 'Fecha', 'Hora', 'Ubicacion', 'Tipo', 'Descripción Física']
-    worksheet.addRow(headers)
-
-    // Agregar datos
-    newObjetoExport.forEach(item => {
-      worksheet.addRow(Object.values(item))
-    })
-    worksheet.columns.forEach(column => {
-      column.width = 18 // Ancho de columna personalizado en unidades de caracteres
-    })
-    worksheet.eachRow((row, rowNumber) => {
-      row.eachCell(cell => {
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        }
-      })
-    })
-    // Aplicar estilos y colores (por ejemplo, celdas coloreadas)
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (rowNumber === 1) {
-        row.eachCell((cell, colNumber) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'a8d5e5' }, // Color amarillo para el encabezado
-          }
-        })
-      } else {
-        row.eachCell((cell, colNumber) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FFFFFF' }, // Color blanco para las celdas de datos
-          };
-        });
-      }
-    });
-
-    // Generar el archivo Excel
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
-    const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '/');
-
-    const fileName = `Entrada y Salidas De Objetos - (fecha descarga- ${formattedDate} hora- ${formattedTime}).xlsx`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-  const descargarPersonas = async (personas) => {
-    let newPersonasExport = []
-    for(let x = 0 ; x < personas.length ; x++){
-      let newPersonas = {
-        _idEntrada: entradasSalidas[x]._id,
-        v_usuario_nombre: entradasSalidas[x].objeto.usuario.nombre,
-        v_usuario_apellido: entradasSalidas[x].objeto.usuario.apellido,
-        v_usuario_tcedula: entradasSalidas[x].objeto.usuario.tcedula,
-        v_usuario_cedula: parseInt(entradasSalidas[x].objeto.usuario.cedula),
-        v_usuario_telefono: parseInt(entradasSalidas[x].objeto.usuario.telefono),
-        v_empresa: entradasSalidas[x].objeto.empresa,
-        v_tipo: entradasSalidas[x].tipo_v,
-        d_tipo: entradasSalidas[x].descripcion,
-        recepcionista: parseInt(entradasSalidas[x].recepcionista),
-        tipo: entradasSalidas[x].tipo,
-        fecha: entradasSalidas[x].fecha,
-        hora: entradasSalidas[x].hora,
-        ubicacion: entradasSalidas[x].ubicacion
-      }
-      newPersonasExport.push(newPersonas)
-    }
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('Entrada Y Salida De Personas')
-    const headers = ['_idEntradas', 'Nombre', 'Apellido', 'Documenuto', 'Cedula', 'Telefono', 'Empresa', 'Tipo de E/S','Descripción', 'Recepcionista', 'Tipo', 'Fecha','Hora', 'ubicación']
-    worksheet.addRow(headers)
-    newPersonasExport.forEach(item => {
-      worksheet.addRow(Object.values(item))
-    })
-    worksheet.columns.forEach(column => {
-      column.width = 22 // Ancho de columna personalizado en unidades de caracteres
-    })
-    worksheet.eachRow((row, rowNumber) => {
-      row.eachCell(cell => {
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        }
-      })
-    })
-    // Aplicar estilos y colores (por ejemplo, celdas coloreadas)
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (rowNumber === 1) {
-        row.eachCell((cell, colNumber) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'a8d5e5' }, // Color amarillo para el encabezado
-          }
-          cell.value = cell.value.toString().toUpperCase()
-          cell.alignment = { horizontal: 'center', vertical: 'middle' }
-        })
-      } else {
-        row.eachCell((cell, colNumber) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FFFFFF' }, // Color blanco para las celdas de datos
-          };
-        });
-      }
-    });
-    // Generar el archivo Excel
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
-    const formattedTime = currentDate.toTimeString().split(' ')[0].replace(/:/g, '/');
-    const fileName = `Entrada y Salidas De Personas - (fecha descarga- ${formattedDate} hora- ${formattedTime}).xlsx`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-  const compararHoraFecha = (a, b) => {
-      // Primero, compara las horas
-     
-      // Si las horas son iguales, compara las fechas
-      const fechaA = new Date(a.fecha);
-      const fechaB = new Date(b.fecha);
-      if (fechaA < fechaB) {
-        return 1; // Cambia -1 a 1 para invertir el orden
-      }
-      if (fechaA > fechaB) {
-        return -1; // Cambia 1 a -1 para invertir el orden
-      }
-      
-      const horaA = new Date(`2023-01-01 ${a.hora}`);
-      const horaB = new Date(`2023-01-01 ${b.hora}`);
-      if (horaA < horaB) {
-        return 1; // Cambia -1 a 1 para invertir el orden
-      }
-      if (horaA > horaB) {
-        return -1; // Cambia 1 a -1 para invertir el orden
-      }
-      return 0; // Si las horas y fechas son iguales
-  }
-  const [ccid, setCcid] = useState(null)
-  const [editar, setEditar] = useState(false)
-  const [editarObjeto, setEditarObjeto] = useState(false)
-  const [personaEditar, setPersonaEditar]= useState(null)
-  const [objetoEditar, setObjetoEditar] = useState(null)
-  const [loading, setLoading] = useState(false)
-  useEffect(()=>{
-    tablaObjetos(tokenN('ubicacion'))
-    setCcid(tokenN('cedula'))
-    tablaES()
-    AOS.init()
-  },[])
-  const handleEditarPersona = (campo, valor) => {
-    // Copia el objeto personaEditar y actualiza el campo específico
-    const personaEditada = { ...personaEditar, [campo]: valor }
-    setPersonaEditar(personaEditada)
-  }
-  const handleEditar = (e) => {
-    e.preventDefault()
-    console.log(personaEditar)
-    const token = tokenN('token')
-    setLoading(true)
-    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/editarEntradaSalidaPersona',{personaEditar},{ headers: { authorization: token } })
-    .then(doc => {
-      Swal.fire('¡Editado!',doc.data.tipo+' Editada Correctamente','success')
-      buscar() 
-      setEditar(false)
-      setLoading(false)
-    })
-    .catch(err => {
-      setLoading(false)
-      console.log(err)
-      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
-    })
-  }
-  const handleEditarObjeto = (campo, valor) => {
-    const objetoEditada = { ...objetoEditar, [campo]: valor }
-    setObjetoEditar(objetoEditada)
-  }
-  const handleEditarO = (e) => {
-    e.preventDefault()
-    console.log(objetoEditar)
-    const token = tokenN('token')
-    setLoading(true)
-    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/editarEntradaSalidaObjeto',{objetoEditar},{ headers: { authorization: token } })
-    .then(doc => {
-      Swal.fire('¡Editado!',doc.data.tipo+' Editada Correctamente','success')
-      buscar()
-      setEditarObjeto(false)
-      setLoading(false)
-    })
-    .catch(err => {
-      setLoading(false)
-      console.log(err)
-      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
-    })
-  }
-  const eliminarEntradaPersona = (EntradaEliminar) => {
-    const token = tokenN('token')  
-    Swal.fire({
-      title: '¿Quieres Eliminar Esta '+EntradaEliminar.tipo+'?',
-      text: "¡Cuidado No Se Recuperaran Los Cambios Una Ves Realizados",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/eliminarEntradaSalida',{EntradaEliminar},{ headers: { authorization: token } })
-        .then(doc => {
-          Swal.fire('¡Eliminada!',doc.data.tipo+' Eliminada Correctamente','success')
-          buscar()
-          
-        })
-        .catch(err => {
-          console.log(err)
-          Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
-        })
-      }
-    })
-    
-  }
-  const eliminarEntradaObjeto = (EntradaEliminar) => {
-    const token = tokenN('token')  
-    Swal.fire({
-      title: '¿Quieres Eliminar Esta '+EntradaEliminar.tipo+'?',
-      text: "¡Cuidado No Se Recuperaran Los Cambios Una Ves Realizados",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        //setLoading(true)
-        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/eliminarEntradaSalidaObjeto',{EntradaEliminar},{ headers: { authorization: token } })
-        .then(doc => {
-          Swal.fire('¡Eliminada!',doc.data.tipo+' Eliminada Correctamente','success')
-          buscar()
-          //setLoading(false)
-        })
-        .catch(err => {
-          //setLoading(false)
-          console.log(err)
-          Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
-        })
-      }
-    })
-    
-  }
+import Home from '../../Home'
+export default function EntradaObjeto(){ 
   const tokenN = (name) => {
     const cookies = document.cookie.split('; ')
+
     for (let i = 0; i < cookies.length; i++) {
       const cookieParts = cookies[i].split('=')
       const cookieName = cookieParts[0]
@@ -328,243 +16,310 @@ export default function EntradasSalidas(){
 
     return null
   }
-  const tablaObjetos = (ubicacion) => {
-     setLoading(true)
+  const [objetoData, setObjetoData] = useState({
+    serial: '',
+    modelo: '',
+    activo: '',
+    descripcion: '',
+    recepcionista: tokenN('cedula')
+  })
+  const [objetos, setObjetos] = useState([])
+  const [mostrarObjeto, setMostrarObjeto] = useState(true)
+  const [ingresarObjeto, setIngresarObjeto] = useState(false)
+  const [salidaObjeto, setSalidaObjeto] = useState(false)
+  const [objeto,setObjeto] = useState(null)
+  const [activo,setActivo] = useState('')
+  const [fecha, setFecha] = useState(null)
+  const [hora,setHora] = useState('')
+  const [descripcionEntrada, setDescripcionEntrada] = useState('')
+  const [tipoObjeto, setTipoObjeto] = useState('Objeto')
+  const [paginaActual, setPaginaActual] = useState(1)
+  const registrosPorPagina = 8
+  const indiceInicio = (paginaActual - 1) * registrosPorPagina
+  const indiceFin = indiceInicio + registrosPorPagina
+  const registrosPaginaActual = objetos.slice(indiceInicio, indiceFin)
+  const [buscar, setBuscar] = useState('')
+  const [loading, setLoading] = useState(true)
+  useEffect(()=>{
+    tablaObjetos('')
+  },[])
+  const tablaObjetos = (filtroUnico) => {
     const token = tokenN('token')
-    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaObjeto',{ubicacion},{
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/lista',{filtroUnico},{
       headers: {
         authorization: token
       }
     })
     .then(doc => {
-      const obj = doc.data.sort(compararHoraFecha)
+      console.log(doc.data)
+      const obj = doc.data
       setObjetos(obj)
+      console.log(objetos)
       setLoading(false)
     })
     .catch(err => {
       console.log(err)
-      setLoading(false)
       Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
     })
   }
-  const tablaES = () => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setObjetoData((prevData) => ({ ...prevData, [name]: value }))
+  }
+  const handleAgregarObjeto = (e) => {
+    e.preventDefault()
     const token = tokenN('token')
-    const ubicacion = tokenN('ubicacion')
-    setLoading(true)
-    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaPersona',{ubicacion},{
-      headers: {
+    
+    Swal.fire({
+      title: '¿Quieres guardar este Activo? \n '+objetoData.activo,
+        
+      showCancelButton: true,
+      confirmButtonText: 'Guardar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/agregar',{objetoData},{
+        headers: {
         authorization: token
+        }
+      })
+        .then(doc => {
+          
+          console.log(doc.data)
+          tablaObjetos()
+          setMostrarObjeto(true)
+          Swal.fire('Activo guardado Correctamente', '', 'success')
+        })
+        .catch(err => {
+          console.log(err)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+          })
+        })
+        
+      } else if (result.isDenied) {
+        Swal.fire('La Acción Fue Cancelada', '', 'info')
       }
     })
-    .then(doc => {
-      const es = doc.data.sort(compararHoraFecha)
-      setEntradasSalidas(es)
-      setLoading(false)
-    })
-    .catch(err => {
-      setLoading(false)
-      console.log(err)
-      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
-    })
+    
+    }
+  const MostrarAgregar = () => {
+    setMostrarObjeto(true)
+    setSalidaObjeto(false)
+    setIngresarObjeto(false)
   }
-  const handleFechaChange = (field, value) => {
-  setFecha(prevFecha => ({
-    ...prevFecha,
-    [field]: value
-  }));
-}
-  const buscar = () => {
-    console.log(fecha)
-    console.log(usuarioId)
-    const token = tokenN('token')
-    if(fecha.dia === '' && fecha.mes === '' && fecha.año === '' && usuarioId.cedula === ''){
-      tablaES()
-      tablaObjetos(tokenN('ubicacion'))
+  const MostrarObtener = () => {
+    setMostrarObjeto(false)
+    setIngresarObjeto(false)
+    setSalidaObjeto(false)
+  }
+  const MostrarIngresar = (objeto) => {
+    setIngresarObjeto(true)
+    setActivo(objeto.activo)
+    setSalidaObjeto(false)
+    setObjeto(objeto)
+    setFecha(null)
+    setHora('')
+    setDescripcionEntrada('')
+  }
+  const MostrarSalida = (objeto) => {
+    setIngresarObjeto(false)
+    setSalidaObjeto(true)
+    setObjeto(objeto)
+    setActivo(objeto.activo)
+    setFecha(null)
+    setHora('')
+    setDescripcionEntrada('')
+  }
+  const handleAgregarEntrada = (e) => {
+    e.preventDefault()
+    if(fecha === null || hora === ''){
+      Swal.fire({ icon: 'warning', title: 'Por favor...!', text: '¡Ingrese Todos Los Campos!' })
     }else{
-      if(tipo === 'Persona'){
-        const ubicacion = tokenN('ubicacion')
+      Swal.fire({
+      title: '¿Quieres realizar la Entrada a este Activo?',
+      text: "Si ya valido que la informacion es correcta Oprimir 'Agregar Entrada",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Agregar Entrada'
+    })
+      .then((result) => {
+      if (result.isConfirmed) {
         setLoading(true)
-        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaPersonaUnica',{usuarioId,fecha,ubicacion},{
+        const token = tokenN('token')
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/agregarEntradaObjeto',{
+          objeto: {
+            recepcionista: tokenN('cedula'),
+            objeto: objeto,
+            fecha: fecha,
+            hora: hora,
+            ubicacion: tokenN('ubicacion'),
+            tipo: 'Entrada',
+            tobjeto: tipoObjeto,
+            descripcion: descripcionEntrada
+          }
+        },{
           headers: {
             authorization: token
           }
         })
         .then(doc => {
+          console.log(doc.data)
           setLoading(false)
-            console.log(doc.data)
-            const es = doc.data.sort(compararHoraFecha)
-            setEntradasSalidas(es)
-            console.log(es)  
+          setIngresarObjeto(false)
+          Swal.fire(
+            '¡Guardado!',
+            'Acción realizada Correctamenete',
+            'success'
+          )
         })
         .catch(err => {
-          setLoading(false)
-            console.log(err)
-            Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+          console.log(err)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
           })
+        })
+        
       }
-      else{
-      if(tipo === 'Activo'){
-        let objetoId = {
-          activo: usuarioId.cedula
-        }
-        const ubicacion = tokenN('ubicacion')
+    })
+    }
+  }
+  const handleAgregarSalida = (e) => {
+    e.preventDefault()
+    if(fecha === null || hora === ''){
+      Swal.fire({ icon: 'warning', title: 'Por favor...!', text: '¡Ingrese Todos Los Campos!' })
+    }else{
+      Swal.fire({
+      title: '¿Quieres realizar la Salida a este Activo?',
+      text: "Si ya valido que la informacion es correcta Oprimir 'Agregar Salida",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Agregar Salida'
+    })
+      .then((result) => {
+      if (result.isConfirmed) {
         setLoading(true)
-        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/entradas/obtenerEntradaSalidaObjetoUnico',{objetoId,fecha,ubicacion},{
-        headers: {
+        const token = tokenN('token')
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io//entradas/agregarEntradaObjeto',{
+        objeto: {
+          recepcionista: tokenN('cedula'),
+          objeto: objeto,
+          fecha: fecha,
+          hora: hora,
+          ubicacion: tokenN('ubicacion'),
+          tipo: 'Salida',
+          tobjeto: tipoObjeto,
+          descripcion: descripcionEntrada
+        }
+      },{
+         headers: {
           authorization: token
         }
       })
-        .then(doc => {
-          setLoading(false)
-            console.log(doc.data)
-            const es = doc.data.sort(compararHoraFecha)
-            setObjetos(es)
-            console.log(es)  
-          })
-        .catch(err => {
-          setLoading(false)
-            console.log(err)
-            Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
-          })
-      }
+      .then(doc => {
+        console.log(doc.data)
+        setLoading(false)
+        setSalidaObjeto(false)
+        Swal.fire(
+          '¡Guardado!',
+          'Acción realizada Correctamenete',
+          'success'
+        )
+      })
+      .catch(err => {
+        console.log(err)
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+        })
+      })
       
+      }
+    })
     }
+  }
+  const buscarObjeto = (buscare) => {
+    let filtroUnico
+    if(buscare){
+      filtroUnico = {
+        activo: buscare
+      }
+    }else{
+      filtroUnico = ''
     }
+     
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/lista',{filtroUnico},{
+      headers: {
+        authorization: token
+      }
+    })
+    .then(doc => {
+      console.log(doc.data)
+      const obj = doc.data
+      setObjetos(obj)
+      console.log(objetos)
+      //setLoading(false)
+    })
+    .catch(err => {
+      console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+    })
     
+    
+    console.log(buscar)
+  }
+  const buscarObjetos = (object) => {
+    
+     
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/listaN',{object},{
+      headers: {
+        authorization: token
+      }
+    })
+    .then(doc => {
+      console.log(doc.data)
+      const obj = doc.data
+      setObjetos(obj)
+      console.log(objetos)
+      //setLoading(false)
+    })
+    .catch(err => {
+      console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+    })
+    
+    
+    console.log(buscar)
   }
   return(
-    <>
-      
-      <div className = 'busqueda'>
-           <div className = 'ccheckboxs'>
-            <div className='checkboxs'>
-              <select className="year-select" value={tipo}  onChange={(e) => setTipo(e.target.value)} >
-                <option value = '' >Seleccionar</option>
-                <option value =  'Persona'>Persona</option>
-                <option value = 'Activo'>Activo</option>
-              </select>
-            </div>
-            <div className='checkboxs'>
-              <label>
-                Año
-                <input
-                  type="checkbox"
-                  name="field1"
-                  checked={activeField === 'field1'}
-                  onChange={handleCheckboxChange}
-                />
-                
-              </label>
-              <label>
-                Mes
-                <input
-                  type="checkbox"
-                  name="field2"
-                  checked={activeField === 'field2'}
-                  onChange={handleCheckboxChange}
-                />
-                
-              </label>
-              <label>
-                Dia
-                <input
-                  type="checkbox"
-                  name="field3"
-                  checked={activeField === 'field3'}
-                  onChange={handleCheckboxChange}
-                />
-                
-              </label>
-            </div>
-            <div className='checkboxs'>
-              {activeField === 'field1' && 
-                <>
-                  <select className="year-select" value={fecha.año}  onChange={(e) => handleFechaChange('año', e.target.value)}>
-                  <option value="">Selecciona un Año</option>
-                  <option value = '2023'>2023</option>
-                  <option value = '2024'>2024</option>
-                  <option value = '2025'>2025</option>
-                  <option value = '2026'>2026</option>
-                </select>
-                  
-                </>
-              }
-              {activeField === 'field2' && 
-                <>
-                  <select className="year-select"  value={fecha.año}  onChange={(e) => handleFechaChange('año', e.target.value)}>
-                  <option value="7878978978">Selecciona un Año</option>
-                  <option value="2023">2023</option>
-                  <option value="2024">2024</option>
-                  <option value="2025">2025</option>
-                </select>
-                <select className="month-select"  value={fecha.mes}  onChange={(e) => handleFechaChange('mes', e.target.value)}>
-                  <option value="">Selecciona un mes</option>
-                  <option value="01">Enero</option>
-                  <option value="02">Febrero</option>
-                  <option value="03">Marzo</option>
-                  <option value="04">Abril</option>
-                  <option value="05">Mayo</option>
-                  <option value="06">Junio</option>
-                  <option value="07">Julio</option>
-                  <option value="08">Agosto</option>
-                  <option value="09">Septiembre</option>
-                  <option value="10">Octubre</option>
-                  <option value="11">Noviembre</option>
-                  <option value="12">Diciembre</option>
-                </select>
-                </>
-              }
-              {activeField === 'field3' && <input className='fechabuscar' type="date" placeholder="Campo 3" onChange={(e)=>{
-                const date = new Date(e.target.value)
-                let d
-                let m
-                if(date.getDate()+1 === 32){
-                  d = date.getDate() - 30
-                  m = date.getMonth() + 2
-                  if(d>9 && m>9){
-                    const a = date.getFullYear()
-                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})                  
-                  }else{
-                    if(d>9 && m<10){
-                      const a = date.getFullYear()
-                      setFecha({dia: ''+d, mes: '0'+m, año: ''+a})
-                    }else{
-                      const a = date.getFullYear()
-                      setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
-                    }
-                    
-                  }
-                }
-                else{ 
-                  d = date.getDate()+1
-                   m = date.getMonth() + 1
-                  if(d>9 && m>9){
-                    const a = date.getFullYear()
-                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})                  
-                  }else{
-                    if(d>9 && m<10){
-                      const a = date.getFullYear()
-                      setFecha({dia: ''+d, mes: '0'+m, año: ''+a})
-                    }else{
-                      const a = date.getFullYear()
-                      setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
-                    }
-                    
-                  }
-                }
-              }}/>}
-            </div>
-            <div className='checkboxs'>
-              <input style={{padding: '7px', borderRadius: '50px', textAlign: 'center' }} type='number' placeholder='###' onChange={(e) => setUsuarioId({cedula: e.target.value})}/>
-            </div>
-            <div className='checkboxs'>
-              <button onClick={()=>buscar()} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' }}>
-                Buscar 🔍
-              </button>
-            </div>
-          </div>
-        </div>
-      {loading && <div>
+   <>
+     <div class="contenedor-card-item">
+		      <div class="contenedor-card-item-wrapper">
+		        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9pwuN55xOQq48Ebu_rZKV287ak67N8yjTDQ&usqp=CAU" alt=""/>
+		        <div class="contenedor-info">
+		          <div class="info">
+		            <p class="titulo"></p>
+		            <span class="categoria">Ayuda</span>
+		          </div>
+		          <div class="fondo"></div>
+		        </div>
+		      </div>
+		    </div>
+     <div className = 'mas_vida'></div>
+    <div className = 'camara' style={{  display: "flex", height: '100vh' }}>
+       
+      <Home />
+      {loading && <div style= {{width: '100%'}}>
         <div className="container">
           <div className="cargando">
             <div className="pelotas"></div>
@@ -574,136 +329,193 @@ export default function EntradasSalidas(){
           </div>
         </div>  
       </div>}
-      {!loading && <>    
-        {tipo === 'Persona' && <div style={{ overflowX: 'auto', maxHeight: '500px' }} data-aos="zoom-in">
-          {!editar === true ? 
-            <div>
-            <div style = {{display: 'flex', justifyContent: 'center', marginTop: '10px'}}>
-          <button onClick={()=>descargarPersonas(entradasSalidas)} style={{ 
-              backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' 
-            }}>
-                Descargar todas las entradas y salidas seleccionadas de Personas
-          </button>
-        </div>
-            <div style = {{
-              display: 'flex', flexDirecton: 'row', justifyContent: 'center', marginTop: '10px', background: 'linear-gradient( white,99.975%, #a8d5e5)', borderRadius: '50px' 
-            }}>   
-                  <div >
-            { entradasSalidas.map((entradasalida) => (
-                <div key={entradasalida._id}>
-                  <div  className = 'ensa' style = {{ textAlign: 'center', background: entradasalida.tipo === 'Entrada' ? '#B5FE57' : '#FFACAC' }}>
-                    <div  style = {{  padding: '10px', flex: '1', textAlign: 'left' }}>{entradasalida.tipo}</div>
-                    <div className = 'ensa'> 
-                      <label style = {{flex: '1', margin: '5px'}}>{entradasalida.objeto.usuario.cedula}</label>
-                      <label style = {{flex: '1', margin: '5px'}}> {entradasalida.tipo === 'Entrada' ? entradasalida.tipo_v : '>>>>' }</label>
-                      <label style = {{flex: '4', margin: '5px'}}> {entradasalida.fecha} {entradasalida.hora}</label>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick={() => Swal.fire('>>>>> '+ entradasalida.tipo + ' <<<<<'+'\n\n'+entradasalida.objeto.usuario.nombre+' '+entradasalida.objeto.usuario.apellido+' \n'+entradasalida.objeto.usuario.tcedula+' '+entradasalida.objeto.usuario.cedula+'\n📅'+entradasalida.fecha+' 🕐   '+entradasalida.hora+'\nRECEPCIONISTA: '+ entradasalida.recepcionista+'\nUbicación: '+entradasalida.ubicacion + '\nMotivo: '+entradasalida.tipo_v+'\n'+entradasalida.descripcion)} >📄</button>
-                      <div style = {{display: ccid === entradasalida.recepcionista   ? 'block': 'none'}}>
-                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick={()=>{
-                          setEditar(true)
-                          setPersonaEditar(entradasalida)
-                        }}>✍</button>
-                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick = {() => eliminarEntradaPersona(entradasalida)}>✂</button>
-                      </div>
+      {!loading && <div style={{width:'100%'}}>
+        <h1  style={{ width:'100%', marginBottom: '10px'}}>Entrada Objeto</h1>   
+        <div className ='agregar_objeto'>
+            
+            {!mostrarObjeto ? (
+              <>
+                  <form onSubmit={handleAgregarObjeto} style={{ maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}>
+                    <h2 style={{ marginBottom: '20px', color: '#333', width: '100%', textAlign: 'center' }}
+>Agregar Objeto</h2>
+                    <div className="">
+                      <label style={{ color: '#555' }}>Serial:</label>
+                      <input
+                        placeholder='exam: ABCDEFG123'
+                        type="text"
+                        name="serial"
+                        value={objetoData.serial}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: '95%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                    </div>
+                    <div className="">
+                      <label style={{ color: '#555' }}>Modelo:</label>
+                      <input
+                        placeholder='exam: HP 270 G4'
+                        type="text"
+                        name="modelo"
+                        value={objetoData.modelo}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: '95%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label style={{ color: '#555' }}>Activo:</label>
+                      <input
+                        placeholder='exam: 12345678'
+                        type="text"
+                        name="activo"
+                        value={objetoData.activo}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: '95%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label style={{ color: '#555' }}>Descripción:</label>
+                      <textarea
+                        placeholder='Detalles Especificos Como Estado fisico del activo'
+                        name="descripcion"
+                        value={objetoData.descripcion}
+                        onChange={handleInputChange}
+                        required
+                        style={{ width: '95%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      ></textarea>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <button type="submit" style={{ marginRight: '10px', padding: '8px 16px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>Agregar</button>
+                      <button onClick={MostrarAgregar} style={{ padding: '8px 16px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>Cancelar</button>
+                    </div>
+                  </form>
+                </>
+            ) : (
+              <>
+                <div style={{display: 'flex', flexDirection: 'column' }}>
+                  <div style = {{display: 'flex', flexDirection: 'row'}}>
+                    <button onClick={MostrarObtener} style={{
+                        padding: '8px 16px',
+                        margin: '10px',
+                        backgroundColor: 'white',
+                        color: 'black',
+                        border: 'none',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      }}>  Agregar Objeto </button>
+                    <input placeholder='Buscar por # Activo' type="text" value={buscar}
+                      onChange={(e) => {
+                        setBuscar(e.target.value)
+                        buscarObjeto(e.target.value)
+                      }}
+                        required
+                        style={{
+                          heigth: '10px', 
+                          padding: '5px 15px', 
+                          marginBottom: '10px', 
+                          borderRadius: '50px', 
+                          border: 'none', 
+                          textAlign: 'center' 
+                        }}
+                      />
+                     <input placeholder='Buscar por Serial' type="text"
+                      onChange={(e) => {
+                        buscarObjetos(e.target.value)
+                      }}
+                        required
+                        style={{
+                          heigth: '10px', 
+                          padding: '5px 15px', 
+                          marginBottom: '10px', 
+                          borderRadius: '50px', 
+                          border: 'none', 
+                          textAlign: 'center' 
+                        }}
+                      />
+                    <button onClick={()=>{tablaObjetos('')}} style={{ background: 'none', color: 'black', border: 'none', borderRadius: '50px',margin: '10px'}}>
+               ䷀
+            </button>
+                  </div>
+                  <div data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
+                    <table style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ backgroundColor: ' #a8d5e5', color: '#fff', borderBottom: '1px solid #ccc', padding: '8px' }}>
+                            Activo
+                          </th>
+                          <th style={{ backgroundColor: ' #a8d5e5', color: '#fff', borderBottom: '1px solid #ccc', padding: '8px' }}>
+                            Modelo
+                          </th>
+                          <th style={{ backgroundColor: ' #a8d5e5', color: '#fff', borderBottom: '1px solid #ccc', padding: '8px' }}>
+                            Serial
+                          </th>
+                          <th style={{ backgroundColor: ' #a8d5e5', color: '#fff', borderBottom: '1px solid #ccc', padding: '8px' }}>
+                            ➡
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {registrosPaginaActual.map((objeto, index) => (
+                          <tr key={index}>
+                            <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.activo}</td>
+                            <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.modelo}</td>
+                            <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{objeto.serial}</td>
+                            <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>
+                              <button
+                                onClick={() => MostrarIngresar(objeto)}
+                                className="btn btn-danger"
+                                style={{ backgroundColor: '#f5f5f5', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px' }}
+                              >
+                                📥
+                              </button>
+                              <button 
+                                onClick={() => MostrarSalida(objeto)}
+                                
+                                style={{ backgroundColor: '#f5f5f5', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px',marginLeft: '5px' }}
+                              > 📤 </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div className="paginacion" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                      <button
+                        onClick={() => setPaginaActual(paginaActual - 1)}
+                        disabled={paginaActual === 1}
+                        className='entradaPersona-Paginas'
+                      >
+                        ⬅
+                      </button>
+                      <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#333', margin:'5px' }}>{paginaActual}</span>
+                      <button
+                        onClick={() => setPaginaActual(paginaActual + 1)}
+                        disabled={indiceFin >= objetos.length}
+                        className='entradaPersona-Paginas'
+                      >
+                        ➡
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))  
-            }
-          </div>
-               
-                
-        </div>    
-          </div> 
-          : 
-            <div>
-            <>
-              <div style={{ textAlign: 'center', paddingLeft: '20px', marginTop: '10px' }}>
-                <form onSubmit={handleEditar} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto'}}> 
-                  <h2 style={{ color: '#333', marginTop: '5px' }}> Editar {personaEditar.tipo} </h2>
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Cedula: #️⃣ - {personaEditar.objeto.usuario.cedula}</label>
-                  
+              </>
+            )}
+            
+            {ingresarObjeto && (
+              <>
+                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
+                <form onSubmit={handleAgregarEntrada} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
+                  <h2 style={{ color: '#333', marginBottom: '20px' }}> Agregar Entrada </h2>
+                  <label htmlFor="Activo" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo} </label>
                   <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {personaEditar.ubicacion}</label>
-                  
-                  <br></br>
-                  {personaEditar.tipo === 'Entrada' && <div>
-                    <select name="tipo" value = {personaEditar.tipo_v} onChange={(e) => handleEditarPersona('tipo_v', e.target.value)} required
-                      style={{
-                        width:'85%', 
-                        padding: '8px', 
-                        marginBottom: '3px', 
-                        borderRadius: '4px', 
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        border: '1px solid #ccc', 
-                        textAlign: 'center'
-                      }}
-                    >
-                      <option value="">Seleccionar</option>
-                      <option value="Proyecto">Proyectos</option>
-                      <option value="Contratista">Contratistas</option>
-                      <option value="Visita">Visitas</option>
-                    </select> 
-                    <br />
-                  </div>} 
-                  <br></br>
-                  {personaEditar.tipo_v === 'Proyecto' && <div>
-                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
-                      style={{
-                        width:'80%', 
-                        padding: '8px', 
-                        marginBottom: '3px', 
-                        borderRadius: '4px', 
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        border: '1px solid #ccc' }}
-                    >
-                      <option value="">Seleccionar</option>
-                      <option value="Reactivate INN">Reactivate INN</option>
-                      <option value="Impulsa">Impulsa</option>
-                      <option value="Coworking">Coworking</option>
-                      <option value="otro">otro</option>
-                    </select>
-                  </div>}
-                  {personaEditar.tipo_v === 'Contratista' && <div>
-                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
-                      style={{
-                        width:'80%', 
-                        padding: '8px', 
-                        marginBottom: '3px', 
-                        borderRadius: '4px', 
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        border: '1px solid #ccc' }}
-                    >
-                      <option value="">Selecionar</option>
-                      <option value="Mantenimiento a equipos">Mantenimiento a equipos</option>
-                      <option value="Reparación">Reparación</option>
-                      <option value="otro">otro</option>
-                    </select>
-                  </div>}
-                  {personaEditar.tipo_v === 'Visita' && <div>
-                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
-                      style={{
-                        width:'80%', 
-                        padding: '8px', 
-                        marginBottom: '3px', 
-                        borderRadius: '4px', 
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        border: '1px solid #ccc' }}
-                    >
-                      <option value="">Selecionar</option>
-                      <option value="Conferencia">Conferencia</option>
-                      <option value="Juntas">Juntas</option>
-                      <option value="otro">otro</option>
-                    </select>
-                  </div>}
-                  <label htmlFor="fecha" style={{ fontSize: '18px', color: '#555' }}>Fecha: </label><br></br>
-                  
-                  <input
-                    type="date"
-                    id="fecha"
-                    name="fecha"
-                    value = {personaEditar.fecha}
-                    onChange={(e) => handleEditarPersona('fecha', e.target.value)}
+                  <label htmlFor="ubicacion" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
+                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -711,19 +523,13 @@ export default function EntradasSalidas(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width:'80%',
+                      width: '95%',
                       textAlign: 'center'
-                    }}
-                    
+                    }} 
                   />
                   <br />
-                  <label htmlFor="time" style={{ fontSize: '18px', color: '#555', borderTop: '0px'}}>Hora:  </label><br></br>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    value={personaEditar.hora}
-                    onChange={(e) => handleEditarPersona('hora', e.target.value)}
+                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
+                  <input  type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -731,13 +537,20 @@ export default function EntradasSalidas(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width:'80%',
-                      textAlign: 'center'
+                      width: '95%'
                     }}
-                    
-                  />
-                  <br /><br />
-                  <input type="submit" value="Editar"
+                  /><br></br>
+                  <textarea
+                    placeholder='Detalles Especificos De La Entrada'
+                    name="descripcion"
+                    value={descripcionEntrada}
+                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
+                    required
+                    style={{ width: '95%', padding: '8px', marginTop: '10px', borderRadius: '4px', border: '1px solid #ccc', heigth: '200px' }}
+                  ></textarea>
+                  
+                  <br />
+                  <input type="submit" value="Enviar"
                     style={{
                       padding: '8px 16px',
                       fontSize: '16px',
@@ -748,61 +561,37 @@ export default function EntradasSalidas(){
                       cursor: 'pointer',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                     }}
-                  />
-                   
+                  />  
                 </form>
-                <button onClick={() => setEditar(false)} style={{border: 'none', background: 'none', marginLeft: '0px'}} >❌</button>
+                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
               </div>
-            </>
-          </div>
-          }
-        </div>}
-        {tipo === 'Activo' && <div style={{ overflowX: 'auto', maxHeight: '500px' }} data-aos="zoom-in">
-          {!editarObjeto === true ? 
-            <div>
-               <div style = {{display: 'flex', justifyContent: 'center', marginTop: '10px'}}>
-            <button onClick={()=>descargarObjetos(objetos)} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '50px', padding: '7px',marginLeft: '5px' }}>
-                Descargar todas las entradas y salidas seleccionadas de Objetos
-          </button>
-          </div>
-              <div style = {{display: 'flex', flexDirecton: 'row', justifyContent: 'center', marginTop: '10px'}}>    
-            <div >
-            { objetos.map((objeto) => (
-                <div key = {objeto._id}>
-                  <div className = 'ensa'  style = {{ textAlign: 'center', background: objeto.tipo  === 'Entrada' ? '#B5FE57' : '#FFACAC', display: 'flex' }}>
-                    <div  style = {{  padding: '10px', flex: '1' }}>{objeto.tipo}</div>
-                    <div className = 'ensa'> 
-                      <label style = {{flex: '1', margin: '5px'}}>{objeto.objeto.activo}</label>
-                      <label style = {{flex: '1', margin: '5px'}}> {objeto.objeto.serial}</label>
-                      <label style = {{flex: '4', margin: '5px'}}> {objeto.fecha} {objeto.hora}</label>
-                      <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick={() => Swal.fire('>>>>> '+ objeto.tipo + ' <<<<<'+'\n\n'+'Activo: '+objeto.objeto.activo+'\nSerial: '+objeto.objeto.serial+'\nModelo: '+objeto.objeto.modelo+'\n📅 '+objeto.fecha+' 🕐   '+objeto.hora+'\nRECEPCIONISTA: '+objeto.recepcionista+'\nUbicación: '+objeto.ubicacion+'\nDescripción: '+objeto.descripcion)}>📄</button>
-                      <div style = {{display: objeto.recepcionista === ccid ? 'block': 'none'}}>
-                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px', filter: 'none'}} onClick = {()=>{
-                          setEditarObjeto(true)
-                          setObjetoEditar(objeto)
-                        }}>✏️</button>
-                        <button style={{borderRadius: '50px', border: 'none', background: 'none', margin: '2px'}} onClick = {()=>eliminarEntradaObjeto(objeto)}>✂</button>
-                      </div>
-                      
-                    </div>
-                  </div>
-                </div>
-              ))  
-            }
-          </div>
-          </div>
-            </div>
-          :
-            <div>
-                <div style={{ textAlign: 'center',  paddingLeft: '20px', marginTop: '10px'}}>
-                <form onSubmit={handleEditarO} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
-                  <h2 style={{ color: '#333', marginBottom: '20px' }}> Editar {objetoEditar.tipo} </h2>
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {objetoEditar.objeto.activo}</label>
+              </>
+            )}
+
+            {salidaObjeto &&(
+              <>
+                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
+                <form onSubmit={handleAgregarSalida} 
+                  style={{
+                    maxWidth: '400px', 
+                    margin: '0 auto', 
+                    backgroundColor: '#f5f5f5', 
+                    padding: '20px', 
+                    borderRadius: '8px', 
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', 
+                    maxHeight: 'calc(100vh - 40px)', 
+                    overflow: 'auto' 
+                  }}
+                > 
+                  <h2 style={{ color: '#333', marginBottom: '20px' }}> -Agregar Salida- </h2>
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo}</label>
                   <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {objetoEditar.ubicacion}</label>
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
                   <br />
                   <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
-                  <input type="date" id="fecha" name="fecha" value = {objetoEditar.fecha} onChange={(e) => handleEditarObjeto('fecha', e.target.value)}
+                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -810,13 +599,12 @@ export default function EntradasSalidas(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width: '95%',
-                      textAlign: 'center'
+                      width: '95%'
                     }}
                   />
                   <br />
                   <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
-                  <input type="time" id="time" name="time" value = {objetoEditar.hora} onChange={(e) => handleEditarObjeto('hora', e.target.value)}
+                  <input type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
                     style={{
                       padding: '8px',
                       fontSize: '16px',
@@ -824,20 +612,23 @@ export default function EntradasSalidas(){
                       border: '1px solid #ccc',
                       outline: 'none',
                       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width: '95%',
-                      textAlign: 'center'
+                      width: '95%'
                     }}
                   />
                   <br />
-                  <textarea
-                    placeholder='Detalles Especificos De La Entrada'
-                    name="descripcion"
-                    value={objetoEditar.descripcion}
-                    onChange={(e) => handleEditarObjeto('descripcion', e.target.value)}
+                  <textarea placeholder='Detalles Especificos De La Salida' name="descripcion" value={descripcionEntrada}
+                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
                     required
-                    style={{ width: '95%', padding: '8px', marginTop: '10px', borderRadius: '4px', border: '1px solid #ccc', heigth: '200px', textAlign: 'center' }}
-                  ></textarea><br></br>
-                  <input type="submit" value="Editar"
+                    style={{ 
+                      width: '95%', 
+                      padding: '8px', 
+                      marginTop: '10px', 
+                      borderRadius: '4px', 
+                      border: '1px solid #ccc', 
+                      heigth: '200px' 
+                    }}
+                  ></textarea>
+                  <input type="submit" value="Enviar"
                     style={{
                       padding: '8px 16px',
                       fontSize: '16px',
@@ -846,17 +637,19 @@ export default function EntradasSalidas(){
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',  
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                     }}
+                    required
                   />
-                   
                 </form>
-                <button onClick={()=>setEditarObjeto(false)} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px'}}>❌</button>
+                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
               </div>
-              </div>
-          }
-        </div>}
-      </>}
-    </>
+              </>
+            )}
+          </div>
+      </div>}
+       
+    </div>
+   </>
   )
 }
