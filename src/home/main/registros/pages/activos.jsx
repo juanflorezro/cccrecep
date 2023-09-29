@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
+import AOS from 'aos'
 
 export default function Activos(){
   const [objetos, setObjetos] = useState([])
@@ -14,7 +14,6 @@ export default function Activos(){
   const [objetoId, setObjetoId] = useState({
     activo: ''
   })
-  const [buscar, setBuscar] = useState(null)
   const handleBuscar = (buscare) => {
     if(buscare){
       const entrada = {
@@ -26,11 +25,10 @@ export default function Activos(){
       tablaObjetos(entrada)
     }
     
-    console.log(buscar)
-    
   }
   useEffect(()=>{
     tablaObjetos('')
+    AOS.init()
   },[])
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -57,7 +55,7 @@ export default function Activos(){
   const tablaObjetos = (filtroUnico) => {
     setLoading(true)
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/objetos/lista',{filtroUnico},{
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/lista',{filtroUnico},{
       headers: {
         authorization: token
       },
@@ -67,16 +65,16 @@ export default function Activos(){
       }
     })
     .then(doc => {
-      console.log(doc.data)
       const obj = doc.data
       setObjetos(obj)
       setLoading(false)
       setProgress(0)
-      console.log(objetos)
     })
     .catch(err => {
       console.log(err)
+      setLoading(false)
       setProgress(0)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
     })
   }
   const editarObjeto = (objeto) => {
@@ -93,61 +91,114 @@ export default function Activos(){
     e.preventDefault()
     
     const token = tokenN('token')
-    var resultado = window.confirm('¿Quieres Editar este Activo? ->> '+objetoId.activo)
-    if (resultado === true) {
-      axios.post('https://express.juanflow04flore.repl.co/objetos/editar',{objetoId,objetoData},{
-        headers: {
-        authorization: token
-        }
-      })
-      .then(doc => {
-        alert('Activo guardado Correctamente \n <<<<<<<  ' + '>>>>>>>>>')
-        console.log(doc.data)
-        setObjetos([])
-        tablaObjetos('')
-        setEditar(false)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    Swal.fire({
+      title: '¿Quieres Editar este Activo?',
+      text: "Si ya valido que la informacion es correcta Oprimir 'Editar'",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Editar'
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true)
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/editar',{objetoId,objetoData},{
+          headers: {
+          authorization: token
+          }
+        })
+        .then(doc => {
+          setObjetos([])
+          tablaObjetos('')
+          setEditar(false)
+          setLoading(false)
+          Swal.fire(
+            '¡Guardado!',
+            'Acción realizada Correctamenete',
+            'success'
+          )
+        })
+        .catch(err => {
+          console.log(err)
+          setLoading(false)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+          })
+        })
       }
-    else { 
-        window.alert('Accion Cancelada')
-      }
-    }
+    })
+  }
   const handleEliminarObjeto = (objeto) => {
-    const objetoIdo = {
-      activo: objeto.activo
-    }
     const token = tokenN('token')
-    var resultado = window.confirm('¿Quieres Elimanar este Objeto? ->> ' + objeto.activo +'\n🚧🚧🚧 NOTA IMPORTANTE: 🚧🚧🚧 \n Si eliminas este Objeto se eliminaran todas sus Entradas y Salidas realizadas. \nSugerencia ❓: Descargue el historial antes de eliminar')
-    if (resultado === true) {
-      console.log('entrando')
-      axios.post('https://express.juanflow04flore.repl.co/objetos/eliminar',{objetoIdo},{
-        headers: {
+    Swal.fire({
+      title: '¿Quieres Elimanar este Objeto?',
+      text: "🚧🚧🚧 NOTA IMPORTANTE: 🚧🚧🚧 \nSi eliminas este Objeto se eliminaran todas sus Entradas y Salidas realizadas. \nSugerencia ❓: Descargue el historial antes de eliminar'",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true)
+        axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/eliminar',{objeto},{
+          headers: {
+          authorization: token
+          }
+        })
+        .then(doc => {
+          console.log(doc.data)
+          setObjetos([])
+          tablaObjetos()
+          setLoading(false)
+          Swal.fire(
+            '¡Eliminado!',
+            'Acción realizada Correctamenete',
+            'success'
+          )
+        })
+        .catch(err => {
+          console.log(err)
+          setLoading(false)
+          Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+        })
+      }
+    })
+  }
+  const buscarObjetos = (object) => {
+     setLoading(true)
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/objetos/listaN',{object},{
+      headers: {
         authorization: token
-        }
-      })
-      .then(doc => {
-        alert('Activo guardado Correctamente \n <<<<<<<  ' + '>>>>>>>>>')
-        console.log(doc.data)
-        setObjetos([])
-        tablaObjetos()
-      })
-      .catch(err => {
-        console.log(err)
-      })
       }
-    else { 
-        window.alert('Accion Cancelada')
-      }
+    })
+    .then(doc => {
+      setLoading(false)
+      console.log(doc.data)
+      const obj = doc.data
+      setObjetos(obj)
+      console.log(objetos)
+      //setLoading(false)
+    })
+    .catch(err => {
+      setLoading(false)
+      console.log(err)
+      Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
+    })
     
   }
   return(
     <>
       <div className = 'busqueda'>
         <div className = 'ccheckboxs'>
-          <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center' }} type="text" placeholder='Buscar por N° de Activo' onChange={(e) => handleBuscar(e.target.value)}/></div>
+          <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center', border: 'none' }} type="text" placeholder='Buscar por N° de Activo' onChange={(e) => handleBuscar(e.target.value)}/></div>
+          <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center', border: 'none' }} type="text" placeholder='Buscar por serial' onChange={(e) => buscarObjetos(e.target.value)}/></div>
+         
           <div className='checkboxs'>
             <button onClick={()=>{tablaObjetos('')}} style={{ background: 'none', color: 'black', border: 'none', borderRadius: '50px', padding: '7px 20px',marginLeft: '5px' }}>
                ䷀
@@ -156,12 +207,12 @@ export default function Activos(){
         </div>
       </div> 
       {loading && <div>
-        <div class="container">
-          <div class="cargando">
-            <div class="pelotas"></div>
-            <div class="pelotas"></div>
-            <div class="pelotas"></div>
-            <span class="texto-cargando">Cargando...{progress ? <>
+        <div className="container">
+          <div className="cargando">
+            <div className="pelotas"></div>
+            <div className="pelotas"></div>
+            <div className="pelotas"></div>
+            <span className="texto-cargando">Cargando...{progress ? <>
               ✔
             </>: <></>}
             </span>
@@ -174,7 +225,7 @@ export default function Activos(){
                     <h2 style={{ marginBottom: '20px', color: '#333', width: '100%', textAlign: 'center' }}
 >Editar Objeto</h2>
                     <div className="form-group">
-                      <label style={{ color: '#555' }} >Activo: {objetoId.activo}</label>
+                      <label style={{ color: '#555' }} >Activo: <label style={{ color: 'red' }}>{objetoId.activo}</label></label>
                       
                     </div>
                     <div className="">
@@ -217,15 +268,15 @@ export default function Activos(){
                   </form>
                 </>    
       </div>}
-      {!editar && <div className='contenerdorobjetos'>
-        {objetos.map((objeto, index) => (
-          <div className='tarejta'>
+      {!editar && <div className='contenerdorobjetos'  style={{ overflowX: 'auto', maxHeight: '400px', padding: '20px'}} >
+        {objetos.map((objeto) => (
+          <div className='tarejta' key = {objeto._id} >
             <label className='t_nombre' style={{marginRight: '20px', marginTop: '5px', fontSize: '38px'}}>{objeto.activo}</label>
             <label className='t_cc' style={{marginRight: '20px', marginTop: '5px'}}>{objeto.modelo}</label>
             <label className='t_tipo' style={{marginRight: '20px', marginTop: '5px'}}>{objeto.serial}</label>
             <div className='t_botones'>
-              <button onClick={() => alert('\n<<<<<<<<<<<<< Mas Detalles >>>>>>>>>>>>>>\n\n'+'Activo: '+objeto.activo+'\nModelo: '+objeto.modelo+'\nSerial (S/N): '+objeto.serial+'\nDescripcion: '+objeto.descripcion)} >📄</button>
-              <button onClick={()=>{editarObjeto(objeto)}}>✍</button>
+              <button onClick={() => Swal.fire('Mas Detalles \n\n'+'Activo: '+objeto.activo+'\nModelo: '+objeto.modelo+'\nSerial (S/N): '+objeto.serial+'\nDescripcion: '+objeto.descripcion)} >📄</button>
+              <button onClick={()=>{editarObjeto(objeto)}}>✏️</button>
               <button onClick={()=>{handleEliminarObjeto(objeto)}}>✂</button>
             </div>
             
