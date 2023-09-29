@@ -32,6 +32,7 @@ export default function Arrys() {
   },[])
   const listarProyectos = () => {
     const token = tokenN('token')
+    setPorcentage(porcentage => porcentage + 15)
     axios.post('https://express.juanflow04flore.repl.co/arrys/obtenerProyectos',{},
     {
       headers: {
@@ -41,7 +42,7 @@ export default function Arrys() {
     .then(doc => { 
       console.log(doc)
       setProyectos(doc.data)
-      setPorcentage(porcentage => porcentage + 40)
+      setPorcentage(porcentage => porcentage + 25)
       listarVisitas()
     })
     .catch(err => {
@@ -55,6 +56,7 @@ export default function Arrys() {
   }
   const listarVisitas = () => {
     const token = tokenN('token')
+    setPorcentage(porcentage => porcentage + 15)
     axios.post('https://express.juanflow04flore.repl.co/arrys/obtenerVisita',{},
     {
       headers: {
@@ -64,7 +66,7 @@ export default function Arrys() {
     .then(doc => { 
       console.log(doc)
       setVisitas(doc.data)
-      setPorcentage(porcentage => porcentage + 45)
+      setPorcentage(porcentage => porcentage + 15)
       listarContratistas()
     })
     .catch(err => {
@@ -78,6 +80,7 @@ export default function Arrys() {
   }
   const listarContratistas = () => {
     const token = tokenN('token')
+    setPorcentage(porcentage => porcentage + 15)
     axios.post('https://express.juanflow04flore.repl.co/arrys/obtenerContratista',{},
     {
       headers: {
