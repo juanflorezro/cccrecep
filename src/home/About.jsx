@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import AOS from 'aos'
+import Git from '../../public/git.png'
 export default function About(){
   useEffect(()=>{
     AOS.init()
@@ -14,12 +15,12 @@ export default function About(){
           <h2 className = 'about_principal_titulo'>"cccrecepción" Gestión De Entradas y Salidas</h2>
         </div>
         <div>
-          <div className= 'has' data-aos="zoom-out-up">
+          <div className= 'has'>
          <div className= 'has-2'>
            
-           <div className='git'> <a href = 'https://github.com/juanflorezro/cccrecepcion'><img className= 'imagen_fondo' src = './git.png'/> </a></div>
+           <div className='git'> <a href = 'https://github.com/juanflorezro/cccrecepcion'><img className= 'imagen_fondo' src = '../../public/git.png'/> </a></div>
            <div className= 'imagen_fondo2'> 
-            <a aria-label="Chat on WhatsApp" href="https://wa.me/573003331333"><img alt="Chat on WhatsApp" src="./what.png" /> 
+            <a aria-label="Chat on WhatsApp" href="https://wa.me/573003331333"><img alt="Chat on WhatsApp" src="../../public/what.png" /> 
             </a>
            </div>
            
@@ -132,7 +133,7 @@ export default function About(){
                 <h3>Control de Usuarios</h3>
                 <div class="contenedor-card-item2" data-aos="zoom-in-up">
   		          <div class="contenedor-card-item-wrapper2">
-  		        <img src="./login.png" alt=""/>
+  		        <img src="../../public/login.png" alt=""/>
   		        <div class="contenedor-info2">
   		          <div class="info2">
   		            <p class="titulo2"></p>
@@ -147,7 +148,7 @@ export default function About(){
                 <h3>Gestión Entradas Y Salidas</h3>
                 <div class="contenedor-card-item2" data-aos="zoom-in-up">
   		          <div class="contenedor-card-item-wrapper2">
-  		        <img src="./es.png" alt=""/>
+  		        <img src="../../public/es.png" alt=""/>
   		        <div class="contenedor-info2">
   		          <div class="info2">
   		            <p class="titulo2"></p>
@@ -164,7 +165,7 @@ export default function About(){
                 <h3>Gestión de Usuarios</h3>
                 <div class="contenedor-card-item2" data-aos="zoom-in-up">
   		          <div class="contenedor-card-item-wrapper2">
-  		        <img src="./gobjetos.png" alt=""/>
+  		        <img src="../../public/gobjetos.png" alt=""/>
   		        <div class="contenedor-info2">
   		          <div class="info2">
   		            <p class="titulo2"></p>
@@ -179,7 +180,7 @@ export default function About(){
                 <h3>Gestión Objetos</h3>
                 <div class="contenedor-card-item2" data-aos="zoom-in-up">
   		          <div class="contenedor-card-item-wrapper2">
-  		        <img src="./gusuarios.png" alt=""/>
+  		        <img src="../../public/gusuarios.png" alt=""/>
   		        <div class="contenedor-info2">
   		          <div class="info2">
   		            <p class="titulo2"></p>
@@ -195,7 +196,7 @@ export default function About(){
                 <h3>Consultas y Exportación de Registros</h3>
                 <div class="contenedor-card-item2" data-aos="zoom-in-up">
   		          <div class="contenedor-card-item-wrapper2" >
-  		        <img src="./ges.png" alt=""/>
+  		        <img src="../../public/ges.png" alt=""/>
   		        <div class="contenedor-info2">
   		          <div class="info2">
   		            <p class="titulo2"></p>
