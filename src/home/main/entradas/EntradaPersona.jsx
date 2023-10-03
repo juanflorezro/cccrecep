@@ -249,6 +249,7 @@ export default function EntradaPersona(){
     setFecha(null)
     setHora('')
     setTipo_v('')
+    scrollToTop()
   }
   const MostrarSalida = (persona) => {
     setIngresarPersona(false)
@@ -257,6 +258,7 @@ export default function EntradaPersona(){
     setPersona(persona)
     setFecha(null)
     setHora('')
+    scrollToTop()
   }
   const handleAgregarEntrada = (e) => {
     e.preventDefault()
@@ -419,10 +421,11 @@ export default function EntradaPersona(){
         Swal.fire({ icon: 'error', title: 'Oops...', text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!' })
       })
   }
-    
+  const scrollToTop = () => {
+    miElementoRef.current.scrollTop = 0;
+  }
   return(
    <>  
-     
     <div className = 'mas_vida'></div>
     <div style={{  display: "flex", height: '100vh' }}>
       <Home />
@@ -439,139 +442,9 @@ export default function EntradaPersona(){
         </div>
       </div>}
       {!loading && <div style={{width:'100%'}}>
-            <h1  style={{ width:'100%', marginBottom: '10px'}}>Entrada Persona</h1>   
-            <div className ='agregar_objeto'>
-            {!mostrarPersona ? (
-                <>
-                  <form onSubmit={handleAgregarPersona} style={{ 
-                    maxWidth: '1500px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' 
-                  }}>
-                    <h2 style={{ 
-                      marginBottom: '20px', color: '#333', width: '100%', textAlign: 'center' 
-                    }}>Agregar Persona</h2>
-                    <br></br>  
-                    <div className="Nombre">
-                      <label style={{ color: '#555' }}>Nombre: </label>
-                      <input placeholder='exam: Juan David' type="text" name="nombre" value={personaData.nombre} onChange={handleInputChange} required
-                        style={{ width: '31%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                      />
-                      <label style={{ color: '#555' }}> Apellido: </label>
-                      <input placeholder='exam: Florez Rodriguez' type="text" name="apellido" value={personaData.apellido} onChange={handleInputChange} required
-                        style={{ width: '31%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                      />
-                    </div>
-                    <div className="cc">
-                      <label style={{ color: '#555' }}>T_Documento: </label>
-                      <select name="tcedula" value={personaData.tcedula} onChange={handleInputChange} required style={{ 
-                        width: '20%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
-                      }}>
-                        <option value="">Seleccionar</option>
-                        <option value="C. Ciudadania">C. Ciudadania</option>
-                        <option value="C. Extrangeria">C. Extrangeria</option>
-                        <option value="D. de Identidad">D. de Identidad</option>
-                      </select>
-                      <label style={{ color: '#555' }}> #_Documento: </label>
-                      <input placeholder='exam: 1234567890' type="number" name="cedula" value={personaData.cedula} onChange={handleInputChange} required style={{ 
-                        width: '26%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
-                      }}/>
-                    </div>
-                    <div className="tel">
-                      <label style={{ color: '#555' }}>Telefono: </label>
-                      <input placeholder='exam: 3003331333' type="number" name="telefono" value={personaData.telefono} onChange={handleInputChange} required style={{ 
-                        width: '17%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
-                      }}/>
-                      <label style={{ color: '#555'}}> Correo: </label>
-                      <input placeholder='exam: ejemplo@gmail.com' type="text" name="correo" value={personaData.correo} onChange={handleInputChange} required style={{ 
-                        width: '46.5%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
-                      }}/>
-                    </div>
-                    <div className="em">
-                      <label style={{ color: '#555' }}>Empresa: </label>
-                      <input placeholder='exam: Camara De Comercio De Cartagena' type="text" name="empresa" value={personaData.empresa} onChange={handleInputChange} required
-                        style={{ width: '37%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                      />
-                      <label style={{ color: '#555' }}> Edad: </label>
-                      <input placeholder='1-99' type="number" name="edad" value={personaData.edad} onChange={handleInputChange} required style={{ 
-                        width: '8%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
-                      }}/>
-                    </div>
-                    <br></br>        
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <button type="submit" style={{ 
-                        marginRight: '10px', padding: '8px 16px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' 
-                      }}>Agregar</button>
-                      <button onClick={MostrarAgregar} style={{ 
-                        padding: '8px 16px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' 
-                      }}>Cancelar</button>
-                    </div>
-                    <br></br>  
-                  </form>
-                </>
-            ) : (
-                <>
-                <div style={{display: 'flex', flexDirection: 'column' }}>
-                  <div style= {{display: 'flex'}}>
-                    <button onClick={MostrarObtener} style={{
-                        padding: '8px 16px',
-                        margin: '10px',
-                        backgroundColor: 'white',
-                        color: 'black',
-                        border: 'none',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                      }}>Agregar Persona</button>
-                    <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center', border: 'none' }} type='number' placeholder='Buscar por # Cedula' onChange={(e) => handleBuscar(e.target.value)}/></div>
-                    <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center', border: 'none' }} type='text' placeholder='Buscar por Nombre' onChange={(e) => handleBuscarn(e.target.value)}/></div>
-                    <div className='checkboxs'>
-                      <button onClick={()=>{tablaPersonas()}} style={{ 
-                      background: 'none', color: 'black', border: 'none', borderRadius: '50px', padding: '7px 10px',marginLeft: '5px' 
-                    }}>䷀</button>
-                    </div>
-                  </div>
-                  <div data-aos="fade-right"
-     data-aos-offset="300"
-     data-aos-easing="ease-in-sine">
-                    <table style={{ 
-                      backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' 
-                    }}>
-                      <thead>
-                        <tr>
-                          <th className = 'entradaPersona-Tabla'>⬆</th>
-                          <th className = 'entradaPersona-Tabla'>Cedula</th>
-                          <th className = 'entradaPersona-Tabla'>Nombres</th>
-                          <th className = 'entradaPersona-Tabla'>➡</th>
-                        </tr>
-                      </thead>
-                      
-                      <tbody >
-                        
-                        {registrosPaginaActual.map((persona, index) => (
-                          <tr key={index} >
-                            <td className = 'entradaPersona-Tabla-td'>
-                              <button onClick={() => {
-                                    Swal.fire('\n Mas Detalles Personales\n\n'+'Nombre: '+persona.usuario.nombre+'\nApellidos: '+persona.usuario.apellido+'\nCorreo: '+persona.usuario.correo+'\nTelefono: '+persona.usuario.telefono+'\nEdad: '+persona.usuario.edad+'\nCedula: '+persona.usuario.cedula+'\nEmpresa: '+persona.empresa)
-                                  }} className="entradaPersona-Tabla-Boton" >📄</button>
-                            </td>
-                            <td className = 'entradaPersona-Tabla-td'>{persona.usuario.cedula}</td>
-                            <td className = 'entradaPersona-Tabla-td'>{persona.usuario.nombre} {persona.usuario.apellido}</td>
-                            <td className = 'entradaPersona-Tabla-td'>
-                              <button onClick={() => MostrarIngresar(persona)} className = 'entradaPersona-Tabla-Boton'>📥</button>
-                              <button  onClick={() => MostrarSalida(persona)} className = 'entradaPersona-Tabla-Boton'>📤</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {carga && <div>Cargando Datos...</div>}
-                    <div className="paginacion" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                      <button onClick={() => setPaginaActual(paginaActual - 1)} disabled={paginaActual === 1} className='entradaPersona-Paginas'>⬅</button>
-                      <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#333', margin: '5px', textAlign: 'center' }}>{paginaActual}</span>
-                      <button onClick={() => setPaginaActual(paginaActual + 1)} disabled={indiceFin >= personas.length} className='entradaPersona-Paginas'>➡</button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
+            <h1  style={{ width:'100%', marginBottom: '10px'}}>Entrada Persona</h1> 
+        <div style={{overflow: 'hidden'}}>
+          <div className ='agregar_objeto'>
             {ingresarpersona && (
                 <>
                   <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
@@ -701,6 +574,7 @@ export default function EntradaPersona(){
                   padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                 }}>❌</button>
                   </div>
+                  <div>------</div>
                 </>
             )}
             {salidaPersona &&(
@@ -753,6 +627,7 @@ export default function EntradaPersona(){
                   <input
                     type="submit"
                     value="Enviar"
+                    onClick={()=>scrollToTop}
                     style={{
                       padding: '8px 16px',
                       fontSize: '16px',
@@ -766,11 +641,146 @@ export default function EntradaPersona(){
                     
                   />
                 </form>
-                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
+                <button onClick={
+                MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
               </div>
+                  <div>----</div>
               </>
             )}
+            
+            {!mostrarPersona ? (
+                <>
+                  <form onSubmit={handleAgregarPersona} style={{ 
+                    maxWidth: '1500px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' 
+                  }}>
+                    <h2 style={{ 
+                      marginBottom: '20px', color: '#333', width: '100%', textAlign: 'center' 
+                    }}>Agregar Persona</h2>
+                    <br></br>  
+                    <div className="Nombre">
+                      <label style={{ color: '#555' }}>Nombre: </label>
+                      <input placeholder='exam: Juan David' type="text" name="nombre" value={personaData.nombre} onChange={handleInputChange} required
+                        style={{ width: '31%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                      <label style={{ color: '#555' }}> Apellido: </label>
+                      <input placeholder='exam: Florez Rodriguez' type="text" name="apellido" value={personaData.apellido} onChange={handleInputChange} required
+                        style={{ width: '31%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                    </div>
+                    <div className="cc">
+                      <label style={{ color: '#555' }}>T_Documento: </label>
+                      <select name="tcedula" value={personaData.tcedula} onChange={handleInputChange} required style={{ 
+                        width: '20%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
+                      }}>
+                        <option value="">Seleccionar</option>
+                        <option value="C. Ciudadania">C. Ciudadania</option>
+                        <option value="C. Extrangeria">C. Extrangeria</option>
+                        <option value="D. de Identidad">D. de Identidad</option>
+                      </select>
+                      <label style={{ color: '#555' }}> #_Documento: </label>
+                      <input placeholder='exam: 1234567890' type="number" name="cedula" value={personaData.cedula} onChange={handleInputChange} required style={{ 
+                        width: '26%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
+                      }}/>
+                    </div>
+                    <div className="tel">
+                      <label style={{ color: '#555' }}>Telefono: </label>
+                      <input placeholder='exam: 3003331333' type="number" name="telefono" value={personaData.telefono} onChange={handleInputChange} required style={{ 
+                        width: '17%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
+                      }}/>
+                      <label style={{ color: '#555'}}> Correo: </label>
+                      <input placeholder='exam: ejemplo@gmail.com' type="text" name="correo" value={personaData.correo} onChange={handleInputChange} required style={{ 
+                        width: '46.5%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
+                      }}/>
+                    </div>
+                    <div className="em">
+                      <label style={{ color: '#555' }}>Empresa: </label>
+                      <input placeholder='exam: Camara De Comercio De Cartagena' type="text" name="empresa" value={personaData.empresa} onChange={handleInputChange} required
+                        style={{ width: '37%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      />
+                      <label style={{ color: '#555' }}> Edad: </label>
+                      <input placeholder='1-99' type="number" name="edad" value={personaData.edad} onChange={handleInputChange} required style={{ 
+                        width: '8%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc' 
+                      }}/>
+                    </div>
+                    <br></br>        
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <button type="submit" style={{ 
+                        marginRight: '10px', padding: '8px 16px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' 
+                      }}>Agregar</button>
+                      <button onClick={MostrarAgregar} style={{ 
+                        padding: '8px 16px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' 
+                      }}>Cancelar</button>
+                    </div>
+                    <br></br>  
+                  </form>
+                </>
+            ) : (
+                <>
+                  
+                <div style={{display: 'flex', flexDirection: 'column' }}>
+                  <div style= {{display: 'flex'}}>
+                    <button onClick={MostrarObtener} style={{
+                        padding: '8px 16px',
+                        margin: '10px',
+                        backgroundColor: 'white',
+                        color: 'black',
+                        border: 'none',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      }}>Agregar Persona</button>
+                    <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center', border: 'none' }} type='number' placeholder='Buscar por # Cedula' onChange={(e) => handleBuscar(e.target.value)}/></div>
+                    <div className='checkboxs'><input style={{padding: '7px', borderRadius: '50px', textAlign: 'center', border: 'none' }} type='text' placeholder='Buscar por Nombre' onChange={(e) => handleBuscarn(e.target.value)}/></div>
+                    <div className='checkboxs'>
+                      <button onClick={()=>{tablaPersonas()}} style={{ 
+                      background: 'none', color: 'black', border: 'none', borderRadius: '50px', padding: '7px 10px',marginLeft: '5px' 
+                    }}>䷀</button>
+                    </div>
+                  </div>
+                  <div >
+                    <table style={{ 
+                      backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' 
+                    }}>
+                      <thead>
+                        <tr>
+                          <th className = 'entradaPersona-Tabla'>⬆</th>
+                          <th className = 'entradaPersona-Tabla'>Cedula</th>
+                          <th className = 'entradaPersona-Tabla'>Nombres</th>
+                          <th className = 'entradaPersona-Tabla'>➡</th>
+                        </tr>
+                      </thead>
+                      
+                      <tbody >
+                        
+                        {registrosPaginaActual.map((persona, index) => (
+                          <tr key={index} >
+                            <td className = 'entradaPersona-Tabla-td'>
+                              <button onClick={() => {
+                                    Swal.fire('\n Mas Detalles Personales\n\n'+'Nombre: '+persona.usuario.nombre+'\nApellidos: '+persona.usuario.apellido+'\nCorreo: '+persona.usuario.correo+'\nTelefono: '+persona.usuario.telefono+'\nEdad: '+persona.usuario.edad+'\nCedula: '+persona.usuario.cedula+'\nEmpresa: '+persona.empresa)
+                                  }} className="entradaPersona-Tabla-Boton" >📄</button>
+                            </td>
+                            <td className = 'entradaPersona-Tabla-td'>{persona.usuario.cedula}</td>
+                            <td className = 'entradaPersona-Tabla-td'>{persona.usuario.nombre} {persona.usuario.apellido}</td>
+                            <td className = 'entradaPersona-Tabla-td'>
+                              <button onClick={() => MostrarIngresar(persona)} className = 'entradaPersona-Tabla-Boton'>📥</button>
+                              <button  onClick={() => MostrarSalida(persona)} className = 'entradaPersona-Tabla-Boton'>📤</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {carga && <div>Cargando Datos...</div>}
+                    <div className="paginacion" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                      <button onClick={() => setPaginaActual(paginaActual - 1)} disabled={paginaActual === 1} className='entradaPersona-Paginas'>⬅</button>
+                      <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#333', margin: '5px', textAlign: 'center' }}>{paginaActual}</span>
+                      <button onClick={() => setPaginaActual(paginaActual + 1)} disabled={indiceFin >= personas.length} className='entradaPersona-Paginas'>➡</button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            
           </div>
+        </div>
       </div>}
     </div>
    </>
