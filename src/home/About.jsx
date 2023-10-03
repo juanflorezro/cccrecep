@@ -40,7 +40,7 @@ export default function About(){
                   <h2 className = 'about_principal_titulo'>Descripción</h2>
                 </div>
                 <div class="card-backd">
-                  <p>El proyecto consiste en el desarrollo de una aplicación integral de gestión de accesos, diseñada para optimizar el control y registro de entradas y salidas de personas y objetos en un entorno empresarial. Esta herramienta proporciona a los recepcionistas la capacidad de administrar de manera eficiente y segura el flujo de entrada y salida, así como realizar consultas detalladas sobre los registros almacenados. Además, ofrece la funcionalidad de exportar estos registros en formato Excel.</p>
+                  <p>El proyecto consiste en el desarrollo de una aplicación integral de gestión de accesos, diseñada para optimizar el control y registro de entradas y salidas de personas y objetos. Esta herramienta proporciona a los recepcionistas la capacidad de administrar de manera eficiente y segura el flujo de entrada y salida, así como realizar consultas detalladas sobre los registros almacenados. Además, ofrece la funcionalidad de exportar estos registros en formato Excel.</p>
                 </div>
               </div>
             </div>
