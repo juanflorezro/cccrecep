@@ -17,7 +17,7 @@ export default function About(){
           <div className= 'has'>
          <div className= 'has-2'>
            
-           <div className='git'> <a href = 'https://github.com/juanflorezro/cccrecepcion'><img className= 'imagen_fondo' src = './git.png'/> </a></div>
+           <div className='git'> <a href = 'https://github.com/juanflorezro/cccrecepcion'><img className= 'imagen_fondo' src = '/git.png'/> </a></div>
            <div className= 'imagen_fondo2'> 
             <a aria-label="Chat on WhatsApp" href="https://wa.me/573003331333"><img alt="Chat on WhatsApp" src="./what.png" /> 
             </a>
