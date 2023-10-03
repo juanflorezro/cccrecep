@@ -177,7 +177,6 @@ export default function Login({path}){
 		        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9pwuN55xOQq48Ebu_rZKV287ak67N8yjTDQ&usqp=CAU" alt=""/>
 		        <div class="contenedor-info">
 		          <div class="info">
-		            <p class="titulo"></p>
 		            <a href='./about' class="categoria">ayuda</a>
 		          </div>
 		          <div class="fondo"></div>
