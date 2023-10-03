@@ -170,7 +170,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 }
 .contenedor-card-item .contenedor-info .info .categoria {
 	display: block;
-	font-size: 30px;
+	font-size: 20px;
   text-align: center;
   color: white;
 }
