@@ -303,7 +303,6 @@ export default function EntradaObjeto(){
   }
   return(
    <>
-     
      <div className = 'mas_vida'></div>
     <div className = 'camara' style={{  display: "flex", height: '100vh' }}>
        
@@ -321,7 +320,151 @@ export default function EntradaObjeto(){
       {!loading && <div style={{width:'100%'}}>
         <h1  style={{ width:'100%', marginBottom: '10px'}}>Entrada Objeto</h1>   
         <div className ='agregar_objeto'>
-            
+            {ingresarObjeto && (
+              <>
+                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} >
+                <form onSubmit={handleAgregarEntrada} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
+                  <h2 style={{ color: '#333', marginBottom: '20px' }}> Agregar Entrada </h2>
+                  <label htmlFor="Activo" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo} </label>
+                  <br />
+                  <label htmlFor="ubicacion" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
+                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%',
+                      textAlign: 'center'
+                    }} 
+                  />
+                  <br />
+                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
+                  <input  type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%'
+                    }}
+                  /><br></br>
+                  <textarea
+                    placeholder='Detalles Especificos De La Entrada'
+                    name="descripcion"
+                    value={descripcionEntrada}
+                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
+                    required
+                    style={{ width: '95%', padding: '8px', marginTop: '10px', borderRadius: '4px', border: '1px solid #ccc', heigth: '200px' }}
+                  ></textarea>
+                  
+                  <br />
+                  <input type="submit" value="Enviar"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '16px',
+                      backgroundColor: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    }}
+                  />  
+                </form>
+                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
+              </div>
+                <div>------</div>
+              </>
+            )}
+
+            {salidaObjeto &&(
+              <>
+                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
+     data-aos-offset="300"
+     data-aos-easing="ease-in-sine">
+                <form onSubmit={handleAgregarSalida} 
+                  style={{
+                    maxWidth: '400px', 
+                    margin: '0 auto', 
+                    backgroundColor: '#f5f5f5', 
+                    padding: '20px', 
+                    borderRadius: '8px', 
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', 
+                    maxHeight: 'calc(100vh - 40px)', 
+                    overflow: 'auto' 
+                  }}
+                > 
+                  <h2 style={{ color: '#333', marginBottom: '20px' }}> -Agregar Salida- </h2>
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
+                  <br />
+                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
+                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%'
+                    }}
+                  />
+                  <br />
+                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
+                  <input type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
+                    style={{
+                      padding: '8px',
+                      fontSize: '16px',
+                      borderRadius: '4px',
+                      border: '1px solid #ccc',
+                      outline: 'none',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                      width: '95%'
+                    }}
+                  />
+                  <br />
+                  <textarea placeholder='Detalles Especificos De La Salida' name="descripcion" value={descripcionEntrada}
+                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
+                    required
+                    style={{ 
+                      width: '95%', 
+                      padding: '8px', 
+                      marginTop: '10px', 
+                      borderRadius: '4px', 
+                      border: '1px solid #ccc', 
+                      heigth: '200px' 
+                    }}
+                  ></textarea>
+                  <input type="submit" value="Enviar"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '16px',
+                      backgroundColor: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    }}
+                    required
+                  />
+                </form>
+                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
+              </div>
+                <div>------</div>
+              </>
+     
+            )}
+          
             {!mostrarObjeto ? (
               <>
                   <form onSubmit={handleAgregarObjeto} style={{ maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}>
@@ -426,9 +569,7 @@ export default function EntradaObjeto(){
                ䷀
             </button>
                   </div>
-                  <div data-aos="fade-right"
-     data-aos-offset="300"
-     data-aos-easing="ease-in-sine">
+                  <div >
                     <table style={{ backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>
                       <thead>
                         <tr>
@@ -492,149 +633,7 @@ export default function EntradaObjeto(){
               </>
             )}
             
-            {ingresarObjeto && (
-              <>
-                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
-     data-aos-offset="300"
-     data-aos-easing="ease-in-sine">
-                <form onSubmit={handleAgregarEntrada} style={{maxWidth: '400px', margin: '0 auto', backgroundColor: '#f5f5f5', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', maxHeight: 'calc(100vh - 40px)', overflow: 'auto' }}> 
-                  <h2 style={{ color: '#333', marginBottom: '20px' }}> Agregar Entrada </h2>
-                  <label htmlFor="Activo" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo} </label>
-                  <br />
-                  <label htmlFor="ubicacion" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
-                  <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
-                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width: '95%',
-                      textAlign: 'center'
-                    }} 
-                  />
-                  <br />
-                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
-                  <input  type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width: '95%'
-                    }}
-                  /><br></br>
-                  <textarea
-                    placeholder='Detalles Especificos De La Entrada'
-                    name="descripcion"
-                    value={descripcionEntrada}
-                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
-                    required
-                    style={{ width: '95%', padding: '8px', marginTop: '10px', borderRadius: '4px', border: '1px solid #ccc', heigth: '200px' }}
-                  ></textarea>
-                  
-                  <br />
-                  <input type="submit" value="Enviar"
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '16px',
-                      backgroundColor: '#007bff',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                  />  
-                </form>
-                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
-              </div>
-              </>
-            )}
-
-            {salidaObjeto &&(
-              <>
-                <div style={{ textAlign: 'center',  paddingLeft: '20px' }} data-aos="fade-right"
-     data-aos-offset="300"
-     data-aos-easing="ease-in-sine">
-                <form onSubmit={handleAgregarSalida} 
-                  style={{
-                    maxWidth: '400px', 
-                    margin: '0 auto', 
-                    backgroundColor: '#f5f5f5', 
-                    padding: '20px', 
-                    borderRadius: '8px', 
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', 
-                    maxHeight: 'calc(100vh - 40px)', 
-                    overflow: 'auto' 
-                  }}
-                > 
-                  <h2 style={{ color: '#333', marginBottom: '20px' }}> -Agregar Salida- </h2>
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>  Activo: #️⃣ - {activo}</label>
-                  <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Ubicacion: 📍 - {tokenN('ubicacion')}</label>
-                  <br />
-                  <label htmlFor="fecha" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Fecha: </label><br />
-                  <input type="date" id="fecha" name="fecha" onChange={(e) => setFecha(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width: '95%'
-                    }}
-                  />
-                  <br />
-                  <label htmlFor="time" style={{ fontSize: '18px', marginBottom: '8px', color: '#555' }}>Hora:  </label><br />
-                  <input type="time" id="time" name="time" onChange={(e) => setHora(e.target.value)}
-                    style={{
-                      padding: '8px',
-                      fontSize: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      outline: 'none',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                      width: '95%'
-                    }}
-                  />
-                  <br />
-                  <textarea placeholder='Detalles Especificos De La Salida' name="descripcion" value={descripcionEntrada}
-                    onChange={(e)=>setDescripcionEntrada(e.target.value)}
-                    required
-                    style={{ 
-                      width: '95%', 
-                      padding: '8px', 
-                      marginTop: '10px', 
-                      borderRadius: '4px', 
-                      border: '1px solid #ccc', 
-                      heigth: '200px' 
-                    }}
-                  ></textarea>
-                  <input type="submit" value="Enviar"
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '16px',
-                      backgroundColor: '#007bff',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                    required
-                  />
-                </form>
-                <button onClick={MostrarAgregar} style={{ padding: '0px 0px', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>❌</button>
-              </div>
-              </>
-            )}
+            
           </div>
       </div>}
        
