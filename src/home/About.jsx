@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import AOS from 'aos'
-import Git from './git.png'
 export default function About(){
   useEffect(()=>{
     AOS.init()
