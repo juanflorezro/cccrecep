@@ -7,6 +7,11 @@ export default function EntradasSalidas(){
   const [activeField, setActiveField] = useState(null)
   const [tipo, setTipo] = useState('')
   const [objetos, setObjetos] = useState([])
+  const [proyectos, setProyectos] = useState([])
+  const [visitas, setVisitas] = useState([])
+  const [contratistas, setContratistas] = useState([]) 
+  const [tipo_v, setTipo_v] = useState('')
+  const [des_v, setDes_v] = useState('')
   const [fecha, setFecha] = useState({
     dia: '',
     mes: '',
@@ -213,8 +218,75 @@ export default function EntradasSalidas(){
     tablaObjetos(tokenN('ubicacion'))
     setCcid(tokenN('cedula'))
     tablaES()
+    listarProyectos()
+    listarVisitas()
+    listarContratistas()
     AOS.init()
   },[])
+  const listarProyectos = () => {
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/arrys/obtenerProyectos',{},
+    {
+      headers: {
+        authorization: token
+      }
+    })
+    .then(doc => { 
+      console.log(doc)
+      setProyectos(doc.data)
+      
+    })
+    .catch(err => {
+      console.log(err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+      })
+    })
+  }
+  const listarVisitas = () => {
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/arrys/obtenerVisita',{},
+    {
+      headers: {
+        authorization: token
+      }
+    })
+    .then(doc => { 
+      console.log(doc)
+      setVisitas(doc.data)
+    })
+    .catch(err => {
+      console.log(err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+      })
+    })
+  }
+  const listarContratistas = () => {
+    const token = tokenN('token')
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/arrys/obtenerContratista',{},
+    {
+      headers: {
+        authorization: token
+      }
+    })
+    .then(doc => { 
+      console.log(doc)
+      setContratistas(doc.data)
+    })
+    .catch(err => {
+      console.log(err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '¡Error, Intente de nuevo o comuniquese con el Departamento Tic!'
+      })
+    })
+  }
   const handleEditarPersona = (campo, valor) => {
     // Copia el objeto personaEditar y actualiza el campo específico
     const personaEditada = { ...personaEditar, [campo]: valor }
@@ -628,27 +700,22 @@ export default function EntradasSalidas(){
                   
                   <br></br>
                   {personaEditar.tipo === 'Entrada' && <div>
-                    <select name="tipo" value = {personaEditar.tipo_v} onChange={(e) => handleEditarPersona('tipo_v', e.target.value)} required
-                      style={{
-                        width:'85%', 
-                        padding: '8px', 
-                        marginBottom: '3px', 
-                        borderRadius: '4px', 
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        border: '1px solid #ccc', 
-                        textAlign: 'center'
-                      }}
-                    >
-                      <option value="">Seleccionar</option>
-                      <option value="Proyecto">Proyectos</option>
-                      <option value="Contratista">Contratistas</option>
-                      <option value="Visita">Visitas</option>
-                    </select> 
-                    <br />
-                  </div>} 
+                     <select name="tipo" value={personaEditar.tipo_v}
+                    onChange={(e)=>{
+                      setDes_v('')
+                       handleEditarPersona('tipo_v', e.target.value)}
+                    }
+                    required
+                    style={{width:'80%', padding: '8px', marginBottom: '3px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',border: '1px solid #ccc' }}
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="Proyecto">Proyectos</option>
+                    <option value="Contratista">Contratistas</option>
+                    <option value="Visita">Visitas</option>
+                  </select>
                   <br></br>
                   {personaEditar.tipo_v === 'Proyecto' && <div>
-                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
+                    <select name="tipo" value={personaEditar.descripcion} onChange={(e) => handleEditarPersona('descripcion', e.target.value)} required
                       style={{
                         width:'80%', 
                         padding: '8px', 
@@ -658,14 +725,13 @@ export default function EntradasSalidas(){
                         border: '1px solid #ccc' }}
                     >
                       <option value="">Seleccionar</option>
-                      <option value="Reactivate INN">Reactivate INN</option>
-                      <option value="Impulsa">Impulsa</option>
-                      <option value="Coworking">Coworking</option>
-                      <option value="otro">otro</option>
+                      {proyectos.map((proyecto) => (
+                        <option value={proyecto.proyecto}>{proyecto.proyecto}</option>
+                      ))}
                     </select>
                   </div>}
                   {personaEditar.tipo_v === 'Contratista' && <div>
-                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
+                    <select name="tipo" value={personaEditar.descripcion} onChange={(e) => handleEditarPersona('descripcion', e.target.value)} required
                       style={{
                         width:'80%', 
                         padding: '8px', 
@@ -675,13 +741,13 @@ export default function EntradasSalidas(){
                         border: '1px solid #ccc' }}
                     >
                       <option value="">Selecionar</option>
-                      <option value="Mantenimiento a equipos">Mantenimiento a equipos</option>
-                      <option value="Reparación">Reparación</option>
-                      <option value="otro">otro</option>
+                      {contratistas.map((contratista) => (
+                        <option value={contratista.contratista}>{contratista.contratista}</option>
+                      ))}
                     </select>
                   </div>}
-                  {personaEditar.tipo_v === 'Visita' && <div>
-                    <select name="tipo" value={personaEditar.descripcion} onChange={(e)=>handleEditarPersona('descripcion', e.target.value)} required
+                  {personaEditar.tipo_v=== 'Visita' && <div>
+                    <select name="tipo" value={personaEditar.descripcion} onChange={(e) => handleEditarPersona('descripcion', e.target.value)}required
                       style={{
                         width:'80%', 
                         padding: '8px', 
@@ -691,11 +757,16 @@ export default function EntradasSalidas(){
                         border: '1px solid #ccc' }}
                     >
                       <option value="">Selecionar</option>
-                      <option value="Conferencia">Conferencia</option>
-                      <option value="Juntas">Juntas</option>
-                      <option value="otro">otro</option>
+                      {visitas.map((visita) => (
+                        <option value={visita.visita}>{visita.visita}</option>
+                      ))}
                     </select>
                   </div>}
+                  </div>} 
+                  
+                  
+                  
+                  
                   <label htmlFor="fecha" style={{ fontSize: '18px', color: '#555' }}>Fecha: </label><br></br>
                   
                   <input
