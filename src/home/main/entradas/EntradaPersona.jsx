@@ -75,7 +75,7 @@ export default function EntradaPersona(){
   },[])
   const listarProyectos = () => {
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/arrys/obtenerProyectos',{},
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/arrys/obtenerProyectos',{},
     {
       headers: {
         authorization: token
@@ -97,7 +97,7 @@ export default function EntradaPersona(){
   }
   const listarVisitas = () => {
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/arrys/obtenerVisita',{},
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/arrys/obtenerVisita',{},
     {
       headers: {
         authorization: token
@@ -118,7 +118,7 @@ export default function EntradaPersona(){
   }
   const listarContratistas = () => {
     const token = tokenN('token')
-    axios.post('https://express.juanflow04flore.repl.co/arrys/obtenerContratista',{},
+    axios.post('https://cccrecepcionbackend-n4au-dev.fl0.io/arrys/obtenerContratista',{},
     {
       headers: {
         authorization: token
