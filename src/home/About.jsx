@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import AOS from 'aos'
 export default function About(){
 
-  
+
   useEffect(()=>{
     AOS.init()
   },[])
@@ -283,7 +283,7 @@ export default function About(){
                     </div>
                     <div class="glass"></div>
                     <div class="content">
-                        <span class="title">Apoyo, Colaborador y Aplicacón</span>
+                        <span class="title">Logistica, Aplicacón y supervisión</span>
                         <span class="text">Gestión de requerimientos y stakeholder, aplicacion y apoyo en funcionalidad</span>
                     </div>
                     <div class="bottom">
