@@ -34,10 +34,10 @@ export default function Tabs () {
               <Tab tab="Arrys" activeTab={activeTab} setActiveTab={setActiveTab} />
             </div>
             <div className="tab-content">
-              {activeTab === 'Entradas y Salidas' && <div><EntradasSalidas/></div>}
-              {activeTab === 'Activos' && <div><Activos/></div>}
-              {activeTab === 'Usuarios' && <div><Personas/></div>}
-              {activeTab === 'Arrys' && <div><Arrys/></div>}
+              {activeTab === 'Gestión Entradas y Salidas' && <div><EntradasSalidas/></div>}
+              {activeTab === 'Gestión de Activos' && <div><Activos/></div>}
+              {activeTab === 'Gestión de Usuarios' && <div><Personas/></div>}
+              {activeTab === 'Gestión Desc. E/S' && <div><Arrys/></div>}
             </div>
           </div>
         </div>
