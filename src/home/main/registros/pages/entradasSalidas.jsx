@@ -591,18 +591,30 @@ export default function EntradasSalidas(){
                 let d
                 let m
                 if(date.getDate()+1 === 32){
+                  console.log('0')
                   d = date.getDate() - 30
                   m = date.getMonth() + 2
+                  console.log(m)
                   if(d>9 && m>9){
                     const a = date.getFullYear()
-                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})                  
+                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})       
+                    console.log('1')
                   }else{
                     if(d>9 && m<10){
                       const a = date.getFullYear()
                       setFecha({dia: ''+d, mes: '0'+m, año: ''+a})
+                      console.log('2')
                     }else{
-                      const a = date.getFullYear()
-                      setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
+                      if(d<10 && m>9){
+                        const a = date.getFullYear()
+                        setFecha({dia: '0'+d, mes: ''+m, año: ''+a})
+                        console.log('3')
+                      }else{
+                        const a = date.getFullYear()
+                        setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
+                        console.log('4')
+                      }
+                      
                     }
                     
                   }
@@ -610,16 +622,28 @@ export default function EntradasSalidas(){
                 else{ 
                   d = date.getDate()+1
                    m = date.getMonth() + 1
+                  console.log(m)
+                  console.log(d)
                   if(d>9 && m>9){
                     const a = date.getFullYear()
-                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})                  
+                    setFecha({dia: ''+d, mes: ''+m, año: ''+a})       
+                    console.log('5')
                   }else{
                     if(d>9 && m<10){
                       const a = date.getFullYear()
                       setFecha({dia: ''+d, mes: '0'+m, año: ''+a})
+                      console.log('6')
                     }else{
-                      const a = date.getFullYear()
-                      setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
+                      if(d<10 && m>9){
+                        const a = date.getFullYear()
+                        setFecha({dia: '0'+d, mes: ''+m, año: ''+a})
+                        console.log('7')
+                      }else{
+                        const a = date.getFullYear()
+                        setFecha({dia: '0'+d, mes: '0'+m, año: ''+a})
+                        console.log('8')
+                      }
+                      
                     }
                     
                   }
