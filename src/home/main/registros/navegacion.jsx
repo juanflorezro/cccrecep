@@ -28,10 +28,10 @@ export default function Tabs () {
           <h2 style={{ width: '100%', textAlign: 'center',background: 'none'}}>Sección de Registros</h2>
           <div>
             <div className="tab-container">
-              <Tab tab="Entradas y Salidas" activeTab={activeTab} setActiveTab={setActiveTab} />
-              <Tab tab="Activos" activeTab={activeTab} setActiveTab={setActiveTab} />
-              <Tab tab="Usuarios" activeTab={activeTab} setActiveTab={setActiveTab} />
-              <Tab tab="Arrys" activeTab={activeTab} setActiveTab={setActiveTab} />
+              <Tab tab="Gestión Entradas y Salidas" activeTab={activeTab} setActiveTab={setActiveTab} />
+              <Tab tab="Gestión de Activos" activeTab={activeTab} setActiveTab={setActiveTab} />
+              <Tab tab="Gestión de Usuarios" activeTab={activeTab} setActiveTab={setActiveTab} />
+              <Tab tab="Gestión Desc. E/S" activeTab={activeTab} setActiveTab={setActiveTab} />
             </div>
             <div className="tab-content">
               {activeTab === 'Gestión Entradas y Salidas' && <div><EntradasSalidas/></div>}
