@@ -16,7 +16,7 @@ const Tab = ({ tab, activeTab, setActiveTab }) => {
 };
 
 export default function Tabs () {
-  const [activeTab, setActiveTab] = useState('Entradas y Salidas')
+  const [activeTab, setActiveTab] = useState('Gestión Entradas y Salidas')
 
   return (
     <>
